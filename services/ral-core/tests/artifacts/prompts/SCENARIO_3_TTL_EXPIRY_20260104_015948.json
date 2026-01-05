@@ -1,0 +1,12 @@
+{
+  "scenario": "SCENARIO_3_TTL_EXPIRY",
+  "timestamp": "20260104_015948",
+  "composed_prompt": "",
+  "included_context": [],
+  "excluded_context": [],
+  "metadata": {
+    "drift_status": "stale",
+    "health_score": 0.8075,
+    "stale_alerts": 1
+  }
+}

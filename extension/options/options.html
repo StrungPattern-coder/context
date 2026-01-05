@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAL_SYSTEM // CONFIG</title>
+  <link rel="stylesheet" href="options.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="scanline"></div>
+  <div class="noise"></div>
+
+  <div class="options-container">
+    <header class="cyber-header">
+      <div class="brand">
+        <div class="brand-icon">[R]</div>
+        <div class="brand-text">
+          <h1>RAL_SYSTEM <span class="version">v3.0</span></h1>
+          <span class="subtitle">REALITY_ANCHORING_LAYER // CONFIG_MODE</span>
+        </div>
+      </div>
+      <div class="server-status" id="serverStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">MODE: LOCAL</span>
+      </div>
+    </header>
+
+    <main class="options-main">
+      <!-- Master Controls -->
+      <section class="cyber-card">
+        <div class="card-header">
+          <h3>// MASTER_CONTROLS</h3>
+        </div>
+        <div class="toggle-row master-toggle">
+          <label class="toggle-option">
+            <input type="checkbox" id="enabled" checked>
+            <span class="toggle-slider"></span>
+            <div class="toggle-content">
+              <span class="toggle-label">RAL_ENABLED</span>
+              <span class="toggle-desc">MASTER_POWER_STATE. DISABLING_HALTS_ALL_INJECTION.</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Mode Selection -->
+      <section class="cyber-card">
+        <div class="card-header">
+          <h3>// OPERATION_MODE</h3>
+        </div>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="mode" value="local" checked>
+            <div class="radio-content">
+              <span class="radio-title">[ LOCAL_ONLY ]</span>
+              <span class="radio-desc">BROWSER_ISOLATED_CONTEXT. NO_SERVER_UPLINK.</span>
+            </div>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="mode" value="hybrid">
+            <div class="radio-content">
+              <span class="radio-title">[ HYBRID_SYNC ]</span>
+              <span class="radio-desc">LOCAL_PRIORITY + SERVER_ENHANCEMENT.</span>
+            </div>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="mode" value="server">
+            <div class="radio-content">
+              <span class="radio-title">[ SERVER_FULL ]</span>
+              <span class="radio-desc">FULL_UPLINK. DRIFT_DETECTION_ACTIVE.</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Server Configuration -->
+      <section class="cyber-card" id="serverConfig">
+        <div class="card-header">
+          <h3>// UPLINK_CONFIG</h3>
+        </div>
+        <div class="form-group">
+          <label for="serverUrl">SERVER_ENDPOINT</label>
+          <div class="input-with-button">
+            <span class="prompt">></span>
+            <input type="url" id="serverUrl" placeholder="HTTPS://RAL-SERVER...">
+            <button type="button" id="testConnection" class="cyber-btn">PING</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="apiKey">AUTH_KEY</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="password" id="apiKey" placeholder="SK-...">
+          </div>
+        </div>
+        <div class="connection-result" id="connectionResult"></div>
+      </section>
+
+      <!-- Basic Context Options (Temporal) -->
+      <section class="cyber-card">
+        <div class="card-header">
+          <h3>// TEMPORAL_CONTEXT</h3>
+        </div>
+        <p class="section-desc">TIME_AND_DATE_REALITY_MARKERS</p>
+        
+        <div class="checkbox-grid">
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeDate" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">TEMPORAL_DATE</span>
+              <span class="checkbox-desc">CURRENT_DATE_MARKER</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeTime" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">TEMPORAL_TIME</span>
+              <span class="checkbox-desc">LOCAL_TIME_MARKER</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeTimezone" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">GEO_TIMEZONE</span>
+              <span class="checkbox-desc">OFFSET_CALCULATION</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeDayPart" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">DAY_PHASE</span>
+              <span class="checkbox-desc">MORNING/EVENING_CONTEXT</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeWeekend" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">WEEKEND_FLAG</span>
+              <span class="checkbox-desc">WEEKEND/WEEKDAY_INDICATOR</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Deep Context Options (Browser Intelligence) -->
+      <section class="cyber-card">
+        <div class="card-header">
+          <h3>// BROWSER_INTELLIGENCE</h3>
+        </div>
+        <p class="section-desc">DEEP_CONTEXT_DATA_STREAMS</p>
+        
+        <div class="checkbox-grid">
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeBrowserTabs" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">OPEN_TABS</span>
+              <span class="checkbox-desc">WHAT_USER_IS_WORKING_ON</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeRecentActivity" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">RECENT_ACTIVITY</span>
+              <span class="checkbox-desc">BROWSING_HISTORY_CONTEXT</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeCurrentFocus" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">FOCUS_CATEGORY</span>
+              <span class="checkbox-desc">CODING/RESEARCH/WORK_MODE</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeRelevantTabs" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">TAB_TITLES</span>
+              <span class="checkbox-desc">NON_AI_TAB_CONTEXT</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Killer Features -->
+      <section class="cyber-card highlight">
+        <div class="card-header">
+          <h3>// KILLER_FEATURES</h3>
+          <span class="badge">CRITICAL</span>
+        </div>
+        <p class="section-desc">WHAT_LLMs_CANNOT_KNOW_WITHOUT_RAL</p>
+        
+        <div class="checkbox-grid">
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeClipboard" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">CLIPBOARD_TRACKING</span>
+              <span class="checkbox-desc">RECENT_SELECTIONS_AND_COPIES</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includePageContent" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">PAGE_CONTENT</span>
+              <span class="checkbox-desc">ACTIVE_PAGE_EXTRACTION</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option">
+            <input type="checkbox" id="includeUserProfile" checked>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">USER_PROFILE</span>
+              <span class="checkbox-desc">PERSISTENT_MEMORY_AND_PREFS</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Future Context (Experimental) -->
+      <section class="cyber-card dimmed">
+        <div class="card-header">
+          <h3>// FUTURE_CONTEXT</h3>
+          <span class="badge experimental">EXPERIMENTAL</span>
+        </div>
+        <p class="section-desc">UPCOMING_DATA_STREAMS</p>
+        
+        <div class="checkbox-grid">
+          <label class="checkbox-option disabled">
+            <input type="checkbox" id="includeLocation" disabled>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">GEO_LOCATION</span>
+              <span class="checkbox-desc">COMING_SOON</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option disabled">
+            <input type="checkbox" id="includeWeather" disabled>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">WEATHER_DATA</span>
+              <span class="checkbox-desc">COMING_SOON</span>
+            </div>
+          </label>
+          
+          <label class="checkbox-option disabled">
+            <input type="checkbox" id="includeCalendar" disabled>
+            <span class="checkbox-box"></span>
+            <div class="checkbox-content">
+              <span class="checkbox-label">CALENDAR_SYNC</span>
+              <span class="checkbox-desc">COMING_SOON</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Advanced Options -->
+      <section class="cyber-card">
+        <div class="card-header">
+          <h3>// ADVANCED_CONFIG</h3>
+        </div>
+        
+        <div class="toggle-row">
+          <label class="toggle-option">
+            <input type="checkbox" id="autoDetect">
+            <span class="toggle-slider"></span>
+            <div class="toggle-content">
+              <span class="toggle-label">AUTO_DETECT</span>
+              <span class="toggle-desc">ONLY_INJECT_WHEN_KEYWORDS_DETECTED</span>
+            </div>
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <label for="maxContextTokens">MAX_CONTEXT_TOKENS</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="number" id="maxContextTokens" value="1000" min="100" max="4000">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="cacheTimeout">CACHE_TIMEOUT (SECONDS)</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="number" id="cacheTimeout" value="15" min="5" max="300">
+          </div>
+        </div>
+      </section>
+
+      <!-- User Profile -->
+      <section class="cyber-card">
+        <div class="card-header">
+          <h3>// USER_PROFILE</h3>
+        </div>
+        <p class="section-desc">PERSISTENT_MEMORY_FOR_LLM_CONTEXT</p>
+        
+        <div class="form-group">
+          <label for="currentProject">CURRENT_PROJECT</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="text" id="currentProject" placeholder="E.G. RAL_EXTENSION_V3">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="techStack">TECH_STACK (COMMA_SEPARATED)</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="text" id="techStack" placeholder="JAVASCRIPT, PYTHON, REACT...">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="customContext">CUSTOM_CONTEXT</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <textarea id="customContext" rows="3" placeholder="ANY_ADDITIONAL_CONTEXT_FOR_LLM..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Task Context (High Value) -->
+      <section class="cyber-card highlight">
+        <div class="card-header">
+          <h3>// TASK_CONTEXT</h3>
+          <span class="badge">HIGH_VALUE</span>
+        </div>
+        <p class="section-desc">WHAT_ARE_YOU_TRYING_TO_ACHIEVE?</p>
+        
+        <div class="form-group">
+          <label for="taskGoal">GOAL</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="text" id="taskGoal" placeholder="WHAT_ARE_YOU_BUILDING?">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="taskCurrentStep">CURRENT_STEP</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="text" id="taskCurrentStep" placeholder="WHAT_STEP_ARE_YOU_ON?">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="taskSuccessCriteria">SUCCESS_CRITERIA</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="text" id="taskSuccessCriteria" placeholder="HOW_WILL_YOU_KNOW_ITS_DONE?">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="taskNonGoals">NON_GOALS</label>
+          <div class="input-wrapper">
+            <span class="prompt">></span>
+            <input type="text" id="taskNonGoals" placeholder="WHAT_ARE_YOU_NOT_TRYING_TO_DO?">
+          </div>
+        </div>
+      </section>
+
+      <!-- Statistics -->
+      <section class="cyber-card">
+        <div class="card-header">
+          <h3>// TELEMETRY</h3>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value" id="promptsEnhanced">0</span>
+            <span class="stat-label">PROMPTS_ENHANCED</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="selectionsTracked">0</span>
+            <span class="stat-label">SELECTIONS_TRACKED</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="lastUsed">NEVER</span>
+            <span class="stat-label">LAST_USED</span>
+          </div>
+        </div>
+        
+        <button id="resetStats" class="cyber-btn danger small">[ RESET_STATS ]</button>
+      </section>
+      
+      <!-- Actions -->
+      <div class="action-row">
+        <button id="exportSettings" class="cyber-btn secondary">[ EXPORT ]</button>
+        <button id="importSettings" class="cyber-btn secondary">[ IMPORT ]</button>
+        <button id="saveSettings" class="cyber-btn primary">[ COMMIT_CHANGES ]</button>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+  
+  <script src="options.js"></script>
+</body>
+</html>

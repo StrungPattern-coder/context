@@ -1,0 +1,12 @@
+{
+  "scenario": "SCENARIO_4_DRIFT_ACCUMULATION",
+  "timestamp": "20260104_020537",
+  "composed_prompt": "Context has 3 corrections",
+  "included_context": [],
+  "excluded_context": [],
+  "metadata": {
+    "correction_count": 3,
+    "drift_status": "conflicting",
+    "health_score": 0.5606249999999999
+  }
+}

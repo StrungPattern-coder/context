@@ -1,0 +1,10 @@
+{
+  "scenario": "SCENARIO_5_EMAIL_AUDIT",
+  "timestamp": "20260104_015748",
+  "composed_prompt": "",
+  "included_context": [],
+  "excluded_context": [],
+  "metadata": {
+    "email_present": false
+  }
+}

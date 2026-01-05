@@ -1,0 +1,71 @@
+/* RAL Extension Styles */
+
+#ral-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999999;
+  pointer-events: none;
+}
+
+.ral-indicator-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.ral-indicator-dot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: ral-pulse 2s ease-in-out infinite;
+}
+
+.ral-indicator-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+/* Flash animation when context is injected */
+#ral-indicator.ral-indicator-flash .ral-indicator-content {
+  border-color: rgba(34, 197, 94, 0.8);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+}
+
+#ral-indicator.ral-indicator-flash .ral-indicator-dot {
+  background: #4ade80;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+#ral-indicator.ral-indicator-flash .ral-indicator-text {
+  color: #4ade80;
+}
+
+@keyframes ral-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Disabled state */
+#ral-indicator.ral-disabled .ral-indicator-dot {
+  background: #64748b;
+  animation: none;
+}
+
+#ral-indicator.ral-disabled .ral-indicator-text {
+  color: #64748b;
+}

@@ -1,0 +1,23 @@
+{
+  "scenario": "SCENARIO_1_MIDNIGHT_BOUNDARY",
+  "timestamp": "20260104_015948",
+  "composed_prompt": "Resolved: Sunday, January 04, 2026",
+  "included_context": [],
+  "excluded_context": [],
+  "metadata": {
+    "session_start": "2026-01-03 23:30:00-05:00",
+    "current_time": "2026-01-04 00:15:00-05:00",
+    "crossover": {
+      "has_crossed": true,
+      "session_date": "2026-01-03",
+      "current_date": "2026-01-04",
+      "confidence": 0.7,
+      "reasoning": "Session started at 23:30 and current time is 00:15. Since it's early morning and the session is recent, 'today' likely refers to January 03."
+    },
+    "resolution": {
+      "resolved_date": "2026-01-04",
+      "confidence": 0.95,
+      "is_ambiguous": false
+    }
+  }
+}

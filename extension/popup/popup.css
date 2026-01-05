@@ -1,0 +1,357 @@
+:root {
+  /* Palette: Project VOLTAGE */
+  --void: #050505;
+  --grid-color: #1a1a1a;
+  --volt: #fcee0a; /* Acid Yellow */
+  --volt-dim: rgba(252, 238, 10, 0.2);
+  --rage: #ff003c; /* Cyberpunk Red */
+  --rage-dim: rgba(255, 0, 60, 0.2);
+  --data: #00f0ff; /* Hologram Cyan */
+  --text-main: #e2e2e2;
+  --text-dim: #666;
+  
+  /* Dimensions */
+  --app-width: 360px;
+  --corner-cut: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  cursor: default; /* Terminal feel */
+}
+
+body {
+  width: var(--app-width);
+  background-color: var(--void);
+  color: var(--text-main);
+  font-family: 'JetBrains Mono', monospace; /* Monospace ONLY */
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-x: hidden;
+  text-transform: uppercase; /* Aggressive styling */
+}
+
+/* --- Background Effects --- */
+.app-container {
+  padding: 20px;
+  min-height: 500px;
+  background-image: 
+    radial-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+  background-size: 4px 4px, 100% 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5) 51%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.3;
+}
+
+.noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* --- Header --- */
+.cyber-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--grid-color);
+  padding-bottom: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  background: var(--volt);
+  color: var(--void);
+  font-weight: 800;
+  padding: 2px 6px;
+  font-size: 14px;
+  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+}
+
+h1 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--volt);
+}
+
+.version {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+.connection-status {
+  font-size: 10px;
+  color: var(--volt);
+  border: 1px solid var(--volt);
+  padding: 2px 6px;
+  background: var(--volt-dim);
+}
+
+/* --- Reality Gauge --- */
+.reality-gauge-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.gauge-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,255,255,0.02);
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+
+/* HUD Brackets */
+.hud-bracket {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--text-dim);
+  opacity: 0.5;
+}
+.top-left { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+.top-right { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+.bottom-left { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+.bottom-right { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+
+.progress-ring__circle {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  stroke-linecap: square; /* Sharp edges */
+}
+
+.gauge-content {
+  position: absolute;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.gauge-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--volt);
+  text-shadow: 0 0 10px var(--volt-dim);
+}
+
+.gauge-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+/* --- Cyber Cards --- */
+.cyber-card {
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid var(--grid-color);
+  padding: 12px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+/* Corner Cut Effect */
+.cyber-card::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  background: var(--volt);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed var(--grid-color);
+  padding-bottom: 4px;
+}
+
+.card-header h3 {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* --- Grid Layout --- */
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.mini-card {
+  margin-bottom: 0;
+  text-align: center;
+  padding: 10px 4px;
+}
+
+.mini-card::after {
+  display: none; /* No corner cut on minis */
+}
+
+.card-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.card-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--data);
+}
+
+/* --- Log Terminal --- */
+.log-terminal {
+  background: #000;
+  border: 1px solid var(--grid-color);
+  padding: 8px;
+  height: 60px;
+  overflow-y: auto;
+  font-size: 10px;
+}
+
+.log-line {
+  margin-bottom: 2px;
+  display: flex;
+  gap: 8px;
+}
+
+.timestamp { color: var(--text-dim); }
+.cmd { color: var(--volt); }
+.info { color: var(--data); }
+
+/* --- Input & Buttons --- */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #000;
+  border: 1px solid var(--grid-color);
+  margin-bottom: 10px;
+  padding: 0 8px;
+}
+
+.prompt {
+  color: var(--volt);
+  margin-right: 8px;
+  font-weight: 700;
+}
+
+input[type="text"] {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 10px 0;
+  color: var(--text-main);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.cyber-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--volt-dim);
+  border: 1px solid var(--volt);
+  color: var(--volt);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-transform: uppercase;
+}
+
+.cyber-btn:hover {
+  background: var(--volt);
+  color: var(--void);
+  box-shadow: 0 0 15px var(--volt-dim);
+}
+
+/* --- Footer --- */
+.cyber-footer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.footer-link {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--volt);
+  text-decoration: underline;
+}
+
+.footer-link.danger:hover {
+  color: var(--rage);
+}
+
+/* --- Utilities --- */
+.badge {
+  font-size: 9px;
+  background: var(--data);
+  color: var(--void);
+  padding: 1px 4px;
+  font-weight: 700;
+}
+
+/* --- Frustrated State --- */
+body.state-frustrated {
+  --volt: var(--rage);
+  --volt-dim: var(--rage-dim);
+  --data: #ff8800;
+}
+
+body.state-frustrated .brand-icon {
+  animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

@@ -1,0 +1,81 @@
+# RAL Core - Production Dockerfile
+# Multi-stage build for optimized production image
+
+# Stage 1: Builder
+FROM python:3.11-slim as builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="$POETRY_HOME/bin:$PATH"
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Copy dependency files
+COPY services/ral-core/pyproject.toml services/ral-core/poetry.lock* ./
+
+# Export requirements
+RUN poetry config virtualenvs.create false \
+    && poetry export -f requirements.txt --without-hashes -o requirements.txt
+
+# Install dependencies
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+# Stage 2: Runtime
+FROM python:3.11-slim as runtime
+
+LABEL maintainer="RAL Team"
+LABEL version="0.1.0"
+LABEL description="Reality Augmentation Layer - Context-Aware AI"
+
+# Create non-root user
+RUN groupadd -r ral && useradd -r -g ral ral
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /install /usr/local
+
+# Copy application code
+COPY services/ral-core/app ./app
+COPY services/ral-core/alembic.ini ./alembic.ini
+COPY services/ral-core/alembic ./alembic
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/data /app/cache \
+    && chown -R ral:ral /app
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    RAL_ENV=production \
+    RAL_LOG_LEVEL=INFO \
+    RAL_HOST=0.0.0.0 \
+    RAL_PORT=8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${RAL_PORT}/health || exit 1
+
+# Switch to non-root user
+USER ral
+
+# Expose port
+EXPOSE 8000
+
+# Default command
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

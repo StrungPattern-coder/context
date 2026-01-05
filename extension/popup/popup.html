@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAL Control Deck</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="scanline"></div>
+  <div class="noise"></div>
+  
+  <div class="app-container">
+    <!-- Header -->
+    <header class="cyber-header">
+      <div class="brand">
+        <div class="brand-icon">[R]</div>
+        <h1>RAL_SYSTEM <span class="version">v4.6</span></h1>
+      </div>
+      <div class="connection-status" id="connectionStatus">
+        <span class="status-text">NET: ONLINE</span>
+      </div>
+    </header>
+
+    <!-- Reality Gauge (Hexagon/Cyber) -->
+    <section class="reality-gauge-section">
+      <div class="gauge-container">
+        <!-- Decorative HUD elements -->
+        <div class="hud-bracket top-left"></div>
+        <div class="hud-bracket top-right"></div>
+        <div class="hud-bracket bottom-left"></div>
+        <div class="hud-bracket bottom-right"></div>
+        
+        <svg class="progress-ring" width="120" height="120">
+          <!-- Dashed background ring -->
+          <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="transparent" r="52" cx="60" cy="60" stroke-dasharray="4 4"/>
+          <!-- Main progress ring -->
+          <circle class="progress-ring__circle" stroke="var(--volt)" stroke-width="4" fill="transparent" r="52" cx="60" cy="60"/>
+        </svg>
+        
+        <div class="gauge-content">
+          <span class="gauge-value" id="gaugeValue">NORM</span>
+          <span class="gauge-label">LOAD_LEVEL</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Intelligence Grid -->
+    <div class="grid-layout">
+      <!-- Battery -->
+      <div class="cyber-card mini-card" id="batteryStatus">
+        <div class="card-label">PWR</div>
+        <div class="card-value data-value">--%</div>
+      </div>
+      
+      <!-- Network -->
+      <div class="cyber-card mini-card" id="networkStatus">
+        <div class="card-label">NET</div>
+        <div class="card-value data-value">4G+</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="cyber-card mini-card" id="globalTabsStatus">
+        <div class="card-label">LNK</div>
+        <div class="card-value data-value">--</div>
+      </div>
+    </div>
+
+    <!-- Privacy Scrubber Log -->
+    <section class="cyber-card log-card">
+      <div class="card-header">
+        <h3>// SCRUBBER_LOG</h3>
+        <span class="badge" id="privacyStatus">ACTIVE</span>
+      </div>
+      <div class="log-terminal" id="scrubberLog">
+        <div class="log-line"><span class="timestamp">10:42:01</span> <span class="cmd">> INIT_SCAN...</span></div>
+        <div class="log-line"><span class="timestamp">10:42:02</span> <span class="info">> PII_SECURE</span></div>
+      </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="cyber-card stack-card">
+      <div class="card-header">
+        <h3>// TECH_STACK</h3>
+      </div>
+      <div class="input-wrapper">
+        <span class="prompt">></span>
+        <input type="text" id="techStackInput" placeholder="INPUT_STACK..." autocomplete="off">
+      </div>
+      <div class="action-row">
+        <button id="saveProfileBtn" class="cyber-btn">
+          [ EXECUTE_SAVE ]
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="cyber-footer">
+      <a href="#" id="openOptions" class="footer-link">SYS_CONFIG</a>
+      <span class="separator">|</span>
+      <a href="#" id="clearData" class="footer-link danger">HARD_RESET</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

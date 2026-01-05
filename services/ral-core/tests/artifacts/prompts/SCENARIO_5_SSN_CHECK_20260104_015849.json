@@ -1,0 +1,10 @@
+{
+  "scenario": "SCENARIO_5_SSN_CHECK",
+  "timestamp": "20260104_015849",
+  "composed_prompt": "What's my account status?",
+  "included_context": [],
+  "excluded_context": [],
+  "metadata": {
+    "ssn_found": false
+  }
+}

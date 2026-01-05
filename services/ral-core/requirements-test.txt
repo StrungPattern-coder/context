@@ -1,0 +1,43 @@
+# RAL Core Test Dependencies
+# Install with: pip install -r requirements-test.txt
+
+# Core testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.5.0  # Parallel test execution
+pytest-timeout>=2.2.0
+
+# Async support
+anyio>=4.0.0
+aiosqlite>=0.19.0  # Async SQLite for testing
+
+# Mocking and fixtures
+factory-boy>=3.3.0
+faker>=22.0.0
+pytest-factoryboy>=2.6.0
+
+# Coverage reporting
+coverage[toml]>=7.4.0
+
+# Type checking for tests
+mypy>=1.8.0
+
+# Security testing
+bandit>=1.7.0  # Security linter
+
+# Performance testing
+pytest-benchmark>=4.0.0
+
+# Snapshot testing (optional, for prompt artifact comparison)
+# pytest-snapshot>=0.9.0
+
+# HTTP mocking (if needed for API tests)
+respx>=0.20.0
+httpx>=0.26.0
+
+# Date/time manipulation
+freezegun>=1.4.0  # For deterministic time testing
+
+# JSON Schema validation
+jsonschema>=4.21.0

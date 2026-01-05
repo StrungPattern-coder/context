@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAL v4.0 Extreme Intelligence Test Suite</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #0d1117;
+      color: #c9d1d9;
+      line-height: 1.6;
+    }
+    
+    h1 {
+      color: #58a6ff;
+      border-bottom: 2px solid #30363d;
+      padding-bottom: 10px;
+    }
+    
+    h2 {
+      color: #8b949e;
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    h2 .badge {
+      background: #238636;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: normal;
+    }
+    
+    .test-section {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .test-section h3 {
+      color: #f0883e;
+      margin-top: 0;
+    }
+    
+    .instructions {
+      background: #21262d;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      border-left: 3px solid #58a6ff;
+    }
+    
+    /* Code blocks */
+    pre, code {
+      font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+    }
+    
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+    }
+    
+    code {
+      padding: 2px 6px;
+    }
+    
+    .code-python { color: #79c0ff; }
+    .code-js { color: #ffa657; }
+    .code-error { color: #f85149; background: #3d1f1f; }
+    .code-shell { color: #7ee787; }
+    
+    /* Interactive elements */
+    button {
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background: #2ea043;
+    }
+    
+    button.danger {
+      background: #da3633;
+    }
+    
+    button.danger:hover {
+      background: #f85149;
+    }
+    
+    .click-target {
+      background: #21262d;
+      border: 2px dashed #30363d;
+      padding: 40px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .click-target:hover {
+      border-color: #58a6ff;
+      background: #161b22;
+    }
+    
+    .click-target:active {
+      background: #0d1117;
+    }
+    
+    /* Sensitive data section */
+    .sensitive-data {
+      background: #3d1f1f;
+      border: 1px solid #f85149;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+    
+    /* Console output */
+    #console {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 15px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    
+    .log-entry {
+      padding: 4px 0;
+      border-bottom: 1px solid #21262d;
+    }
+    
+    .log-success { color: #7ee787; }
+    .log-warning { color: #ffa657; }
+    .log-error { color: #f85149; }
+    .log-info { color: #58a6ff; }
+    
+    /* Status indicators */
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    
+    .status.active {
+      background: rgba(35, 134, 54, 0.2);
+      color: #7ee787;
+    }
+    
+    .status.inactive {
+      background: rgba(218, 54, 51, 0.2);
+      color: #f85149;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    
+    /* Grid layouts */
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    /* DSA Problem simulation */
+    .dsa-problem {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .dsa-problem h4 {
+      color: #58a6ff;
+      margin-top: 0;
+    }
+    
+    .difficulty-easy { color: #7ee787; }
+    .difficulty-medium { color: #ffa657; }
+    .difficulty-hard { color: #f85149; }
+    
+    /* Tabs simulation */
+    .tabs-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .tab-chip {
+      background: #21262d;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 13px;
+    }
+    
+    /* Circular motion area */
+    #motionArea {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+      border: 2px solid #30363d;
+      border-radius: 8px;
+      position: relative;
+      cursor: crosshair;
+    }
+    
+    #motionTrail {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #58a6ff;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: all 0.05s;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 RAL v4.0 Extreme Intelligence Test Suite</h1>
+  
+  <p>This page tests all v4.0 features. Open the browser console (F12) to see RAL logs.</p>
+  
+  <div class="test-section">
+    <h3>📡 Extension Status</h3>
+    <div id="extensionStatus">
+      <span class="status inactive">
+        <span class="status-dot"></span>
+        Checking...
+      </span>
+    </div>
+    <button onclick="checkExtension()">Check Extension Status</button>
+    <button onclick="clearConsole()">Clear Console</button>
+  </div>
+  
+  <div id="console"></div>
+
+  <!-- ================================================================== -->
+  <h2>Module 1: Frustration Detection <span class="badge">UX Psychology</span></h2>
+  <!-- ================================================================== -->
+  
+  <div class="instructions" style="margin: 20px 0; background: #2d333b; border-left: 4px solid #f0883e;">
+    <p><strong>🧠 v4.1 Intelligence Update:</strong> Frustration detection is now <em>truly intelligent</em>, not just pattern-matching:</p>
+    <ul style="margin: 10px 0;">
+      <li>Requires <strong>5+ selections</strong> (was 3) of <strong>exact same text</strong> (20+ chars) in <strong>45 seconds</strong></li>
+      <li>Validates selections are separate events (≥500ms apart), not drag-selecting</li>
+      <li>Rage clicks require <strong>7+ clicks</strong> (was 5) <strong>clustered within 100px</strong> in 1.5 seconds</li>
+      <li>Mouse movement needs <strong>30+ samples</strong> with <strong>10+ direction changes</strong> and <strong>800+ px traveled</strong></li>
+      <li><strong>Confirmation mechanism:</strong> First signal marks "elevated", needs 2+ signals to confirm "FRUSTRATED"</li>
+      <li><strong>15-second auto-reset</strong> (was 30s) - frustration clears quickly once resolved</li>
+    </ul>
+  </div>
+  
+  <div class="test-section">
+    <h3>🔴 Test 1.1: Repeated Selection (Select same text 5+ times in 45s)</h3>
+    <div class="instructions">
+      <strong>Test:</strong> Select this exact text block below <strong>5 times</strong> within 45 seconds.
+      Each selection must be a separate action (wait 0.5s between selections).
+      RAL will first show "elevated" on first signal, then "FRUSTRATED" on confirmation.
+    </div>
+    <pre class="code-python">
+# This is the frustration test block - SELECT ME 5 TIMES with pauses!
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+    </pre>
+    <p><strong>Expected:</strong> First few: "⚠️ FRUSTRATION_SIGNAL (awaiting confirmation)" → Then: "🔴 FRUSTRATION_CONFIRMED"</p>
+  </div>
+  
+  <div class="test-section">
+    <h3>🔴 Test 1.2: Rage Clicks (Click 7+ times in 1.5 seconds, clustered)</h3>
+    <div class="instructions">
+      <strong>Test:</strong> Rapidly click on the <strong>same spot</strong> in the code block below (7+ clicks in 1.5 seconds).
+      Normal double/triple clicks won't trigger - you need true rage clicking in one spot!
+    </div>
+    <pre class="click-target code-js" onclick="logClick()">
+// RAGE CLICK THIS CODE BLOCK (7+ times fast in ONE spot!)
+const frustrationTest = () => {
+  console.log("Why isn't this working?!");
+  throw new Error("Still broken!");
+};
+    </pre>
+    <p id="clickCounter">Clicks: 0</p>
+    <p><strong>Expected:</strong> Console shows "🔴 FRUSTRATION_DETECTED - rage_clicks" with cluster_radius: 100</p>
+  </div>
+  
+  <div class="test-section">
+    <h3>🔴 Test 1.3: Rage Mouse Movements (Erratic circular motion)</h3>
+    <div class="instructions">
+      <strong>Test:</strong> Move your mouse in rapid, erratic circles within the area below for 3 seconds.
+      You need to cover <strong>800+ pixels total</strong> with <strong>10+ direction changes</strong> - normal movement won't trigger!
+    </div>
+    <div id="motionArea">
+      <div id="motionTrail"></div>
+      <p style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5;">
+        Move mouse in ERRATIC circles here - fast and random!
+      </p>
+    </div>
+    <p><strong>Expected:</strong> Console shows "🔴 FRUSTRATION_DETECTED - rage_movement"</p>
+  </div>
+
+  <!-- ================================================================== -->
+  <h2>Module 2: Cross-Tab Semantic Fusion <span class="badge">BroadcastChannel</span></h2>
+  <!-- ================================================================== -->
+  
+  <div class="test-section">
+    <h3>📡 Test 2.1: BroadcastChannel Communication</h3>
+    <div class="instructions">
+      <strong>Test:</strong> 
+      <ol>
+        <li>Open this page in 2+ browser tabs</li>
+        <li>Select different text in each tab</li>
+        <li>Check console for "Cross-tab update from..." messages</li>
+      </ol>
+    </div>
+    <button onclick="openNewTab()">Open Another Test Tab</button>
+    <button onclick="broadcastTest()">Send Test Broadcast</button>
+    
+    <h4>Tab 1 Content (select this in Tab 1):</h4>
+    <pre class="code-js">
+// React Hooks documentation
+import { useState, useEffect } from 'react';
+
+function useCustomHook() {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    fetchData().then(setData);
+  }, []);
+  return data;
+}
+    </pre>
+    
+    <h4>Tab 2 Content (select this in Tab 2):</h4>
+    <pre class="code-python">
+# Python async programming
+import asyncio
+
+async def fetch_data():
+    await asyncio.sleep(1)
+    return {"status": "success"}
+
+asyncio.run(fetch_data())
+    </pre>
+    
+    <div id="globalContext" style="margin-top: 20px;">
+      <h4>Global Context (Unified Reality):</h4>
+      <code>Waiting for cross-tab data...</code>
+    </div>
+  </div>
+
+  <!-- ================================================================== -->
+  <h2>Module 3: Hardware-Aware Reality <span class="badge">Environment Ingress</span></h2>
+  <!-- ================================================================== -->
+  
+  <div class="test-section">
+    <h3>⚡ Test 3.1: Battery & Network Status</h3>
+    <div class="instructions">
+      <p>RAL automatically detects battery level and network type.
+      If battery &lt;10% or Save Data is on, it adds <code>system_constraint: 'low_power_optimized'</code>.</p>
+      <p style="margin-top: 10px; padding: 10px; background: #3d2f1f; border-radius: 4px; border-left: 3px solid #f0883e;">
+        <strong>⚠️ Web API Limitations (Honest Truth):</strong>
+        <br>The Network Information API is <strong>fundamentally limited</strong>:
+        <br>• <code>effectiveType</code>: Only returns <code>'4g'</code>, <code>'3g'</code>, <code>'2g'</code>, <code>'slow-2g'</code> — <strong>NO '5g' EXISTS</strong>
+        <br>• <code>downlink</code>: Returns rough estimates (often 0, 1.4, 2.2, 10 Mbps) — NOT actual speed
+        <br>• <code>type</code>: Shows <code>'wifi'</code> for hotspots (local link), can't see phone's 5G
+        <br>• <code>rtt</code>: Often 0 or very rough estimates
+        <br>
+        <br><strong>RAL's Approach:</strong> We report what the browser tells us honestly. 
+        We show <code>4g+</code> when downlink ≥10 Mbps to indicate "better than baseline 4g", 
+        but we <u>cannot</u> reliably detect 5G via this API.
+      </p>
+    </div>
+    <button onclick="checkHardware()">Check Hardware Status</button>
+    <div id="hardwareStatus" style="margin-top: 15px;">
+      <p>🔋 Battery: <span id="batteryLevel">Checking...</span></p>
+      <p>🔌 Charging: <span id="chargingStatus">Checking...</span></p>
+      <p>📶 Connection: <span id="connectionType">Checking...</span></p>
+      <p>📊 Downlink: <span id="downlinkSpeed">Checking...</span></p>
+      <p>⏱️ RTT: <span id="rttLatency">Checking...</span></p>
+      <p>📵 Save Data: <span id="saveDataMode">Checking...</span></p>
+      <p>⚠️ System Constraint: <span id="systemConstraint">None</span></p>
+    </div>
+  </div>
+
+  <!-- ================================================================== -->
+  <h2>Module 4: Privacy Scrubbing <span class="badge">PII Masking</span></h2>
+  <!-- ================================================================== -->
+  
+  <div class="test-section">
+    <h3>🔒 Test 4.1: API Key Masking</h3>
+    <div class="instructions">
+      <strong>Test:</strong> Select and copy the sensitive data below. RAL should mask it before sending.
+    </div>
+    <div class="sensitive-data">
+      <p><strong>⚠️ FAKE CREDENTIALS - FOR TESTING ONLY:</strong></p>
+      <pre>
+# Config file with secrets
+OPENAI_API_KEY=sk-1234567890abcdefghijklmnopqrstuvwxyz
+AWS_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+STRIPE_SECRET=sk_live_1234567890abcdefghij
+
+# Database connection
+DATABASE_URL=postgres://user:password123@localhost:5432/mydb
+API_SECRET="my_super_secret_api_key_12345678901234"
+      </pre>
+    </div>
+    <p><strong>Expected:</strong> Console shows "Privacy scrubbing applied - X sensitive item(s) masked"</p>
+  </div>
+  
+  <div class="test-section">
+    <h3>📧 Test 4.2: Email & IP Masking</h3>
+    <div class="instructions">
+      <strong>Test:</strong> Select the personal data below.
+    </div>
+    <div class="sensitive-data">
+      <pre>
+Contact: john.doe@company.com
+CC: admin@example.org, support@test.io
+Server IP: 192.168.1.100
+External: 54.239.28.85
+IPv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+      </pre>
+    </div>
+    <p><strong>Expected:</strong> Emails become [MASKED_EMAIL]@domain, IPs become [MASKED_IPV4]</p>
+  </div>
+  
+  <div class="test-section">
+    <h3>🔐 Test 4.3: JWT & Private Key Masking</h3>
+    <div class="instructions">
+      <strong>Test:</strong> Select the tokens below.
+    </div>
+    <div class="sensitive-data">
+      <pre>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA2Z3qX2BTLS4e0rYMIiX+qPlQnv8UWQ0gqcYS0uGe1tKktbXq
+-----END RSA PRIVATE KEY-----
+      </pre>
+    </div>
+    <p><strong>Expected:</strong> JWT becomes [MASKED_JWT], Private key becomes [MASKED_PRIVATE_KEY]</p>
+  </div>
+
+  <!-- ================================================================== -->
+  <h2>Content Detection Tests <span class="badge">Structural Intelligence</span></h2>
+  <!-- ================================================================== -->
+  
+  <div class="test-grid">
+    <div class="test-section">
+      <h3>💻 Test: Code Detection</h3>
+      <pre class="code-python">
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+      </pre>
+      <p><strong>Expected:</strong> analysis.type = "code", language = "python"</p>
+    </div>
+    
+    <div class="test-section">
+      <h3>🐛 Test: Error Detection</h3>
+      <pre class="code-error">
+Traceback (most recent call last):
+  File "app.py", line 42, in <module>
+    result = process_data(None)
+  File "app.py", line 15, in process_data
+    return data.strip()
+AttributeError: 'NoneType' object has no attribute 'strip'
+      </pre>
+      <p><strong>Expected:</strong> analysis.type = "error_message"</p>
+    </div>
+    
+    <div class="test-section">
+      <h3>🖥️ Test: Shell Command Detection</h3>
+      <pre class="code-shell">
+$ npm install react react-dom typescript
+$ git clone https://github.com/user/repo.git
+$ docker-compose up -d --build
+$ kubectl apply -f deployment.yaml
+      </pre>
+      <p><strong>Expected:</strong> clipboard_metadata.predictedNextAction = "terminal_execution"</p>
+    </div>
+  </div>
+
+  <div class="test-section dsa-problem">
+    <h4>🧩 Test: DSA Problem Detection</h4>
+    <p class="difficulty-medium">Difficulty: Medium</p>
+    <p><strong>Problem:</strong> Two Sum</p>
+    <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.</p>
+    
+    <p><strong>Example 1:</strong></p>
+    <pre>
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+    </pre>
+    
+    <p><strong>Constraints:</strong></p>
+    <ul>
+      <li>2 ≤ nums.length ≤ 10<sup>4</sup></li>
+      <li>-10<sup>9</sup> ≤ nums[i] ≤ 10<sup>9</sup></li>
+      <li>Only one valid answer exists.</li>
+    </ul>
+    <p><strong>Expected:</strong> analysis.type = "dsa_problem", algorithms detected</p>
+  </div>
+
+  <!-- ================================================================== -->
+  <h2>Telemetry Tests <span class="badge">Interaction Tracking</span></h2>
+  <!-- ================================================================== -->
+  
+  <div class="test-section">
+    <h3>📊 Test: Reading Mode Detection</h3>
+    <div class="instructions">
+      <ul>
+        <li><strong>Deep Study:</strong> Scroll slowly through this page (avgVelocity &lt; 0.3)</li>
+        <li><strong>Quick Troubleshooting:</strong> Scroll rapidly (avgVelocity &gt; 1.5)</li>
+        <li><strong>Normal:</strong> Regular scrolling speed</li>
+      </ul>
+    </div>
+    <p>Current detected mode will appear in telemetry.readingMode</p>
+  </div>
+  
+  <div class="test-section">
+    <h3>⏱️ Test: Dwell Time & Cognitive Load</h3>
+    <div class="instructions">
+      Select some text and keep it selected for:
+      <ul>
+        <li><strong>&gt;5 seconds:</strong> High cognitive load (confusion)</li>
+        <li><strong>2-5 seconds:</strong> Medium cognitive load</li>
+        <li><strong>&lt;2 seconds:</strong> Normal</li>
+      </ul>
+    </div>
+    <pre>
+// Complex code to stare at for cognitive load testing
+const complexFunction = (matrix) => {
+  return matrix.reduce((acc, row, i) => {
+    return acc.concat(row.map((cell, j) => ({
+      value: cell,
+      neighbors: getNeighbors(matrix, i, j).filter(n => n !== null)
+    })));
+  }, []).filter(cell => cell.neighbors.length >= 2);
+};
+    </pre>
+  </div>
+
+  <script>
+    let clickCount = 0;
+    
+    // Console logging
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      console.appendChild(entry);
+      console.scrollTop = console.scrollHeight;
+    }
+    
+    function clearConsole() {
+      document.getElementById('console').innerHTML = '';
+      log('Console cleared', 'info');
+    }
+    
+    // Check if extension is loaded
+    function checkExtension() {
+      const statusEl = document.getElementById('extensionStatus');
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+        statusEl.innerHTML = `
+          <span class="status active">
+            <span class="status-dot"></span>
+            RAL v4.0 Active
+          </span>
+        `;
+        log('✅ RAL Extension is active!', 'success');
+      } else {
+        statusEl.innerHTML = `
+          <span class="status inactive">
+            <span class="status-dot"></span>
+            Extension Not Detected
+          </span>
+        `;
+        log('❌ RAL Extension not detected. Make sure it\'s installed and enabled.', 'error');
+      }
+    }
+    
+    // Click counter for rage click test
+    function logClick() {
+      clickCount++;
+      document.getElementById('clickCounter').textContent = `Clicks: ${clickCount}`;
+      log(`Click #${clickCount} registered`, 'info');
+      
+      // Reset after 3 seconds of no clicks
+      setTimeout(() => {
+        clickCount = Math.max(0, clickCount - 1);
+      }, 3000);
+    }
+    
+    // Motion tracking for rage movement test
+    const motionArea = document.getElementById('motionArea');
+    const motionTrail = document.getElementById('motionTrail');
+    
+    motionArea.addEventListener('mousemove', (e) => {
+      const rect = motionArea.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      motionTrail.style.left = `${x - 5}px`;
+      motionTrail.style.top = `${y - 5}px`;
+    });
+    
+    // Open new tab for cross-tab testing
+    function openNewTab() {
+      window.open(window.location.href, '_blank');
+      log('Opened new tab for cross-tab testing', 'info');
+    }
+    
+    // Broadcast test
+    function broadcastTest() {
+      try {
+        const channel = new BroadcastChannel('RAL_UNIFIED_REALITY');
+        channel.postMessage({
+          type: 'TEST_BROADCAST',
+          message: 'Hello from test page!',
+          timestamp: Date.now()
+        });
+        log('📡 Sent test broadcast to RAL_UNIFIED_REALITY channel', 'success');
+        channel.close();
+      } catch (e) {
+        log('BroadcastChannel not supported: ' + e.message, 'error');
+      }
+    }
+    
+    // Listen for broadcasts
+    try {
+      const listener = new BroadcastChannel('RAL_UNIFIED_REALITY');
+      listener.onmessage = (event) => {
+        const globalContextEl = document.getElementById('globalContext');
+        log(`📡 Received broadcast: ${JSON.stringify(event.data).substring(0, 100)}...`, 'info');
+        globalContextEl.innerHTML = `
+          <h4>Global Context (Unified Reality):</h4>
+          <pre>${JSON.stringify(event.data, null, 2)}</pre>
+        `;
+      };
+    } catch (e) {
+      log('Could not set up BroadcastChannel listener', 'warning');
+    }
+    
+    // Hardware status check
+    async function checkHardware() {
+      log('Checking hardware status...', 'info');
+      
+      // Battery API
+      try {
+        if ('getBattery' in navigator) {
+          const battery = await navigator.getBattery();
+          document.getElementById('batteryLevel').textContent = `${Math.round(battery.level * 100)}%`;
+          document.getElementById('chargingStatus').textContent = battery.charging ? 'Yes ⚡' : 'No 🔋';
+          
+          const constraint = battery.level < 0.1 && !battery.charging ? 'low_power_optimized' : 'None';
+          document.getElementById('systemConstraint').textContent = constraint;
+          
+          log(`Battery: ${Math.round(battery.level * 100)}%, Charging: ${battery.charging}`, 'success');
+        } else {
+          document.getElementById('batteryLevel').textContent = 'API not available';
+          log('Battery API not available', 'warning');
+        }
+      } catch (e) {
+        log('Battery API error: ' + e.message, 'error');
+      }
+      
+      // Network Information API - HONEST REPORTING
+      try {
+        if ('connection' in navigator) {
+          const conn = navigator.connection;
+          const effectiveType = conn.effectiveType || 'unknown';
+          const downlink = conn.downlink || 0;
+          const rtt = conn.rtt || 0;
+          const physicalType = conn.type || 'unknown';
+          const saveData = conn.saveData || false;
+          
+          // HONEST CLASSIFICATION (mirrors selection-tracker.js v4.1)
+          let displayType;
+          let quality;
+          
+          switch (effectiveType) {
+            case '4g':
+              quality = 'good';
+              displayType = downlink >= 10 ? '4g+' : '4g';
+              break;
+            case '3g':
+              quality = 'moderate';
+              displayType = '3g';
+              break;
+            case '2g':
+            case 'slow-2g':
+              quality = 'poor';
+              displayType = effectiveType;
+              break;
+            default:
+              quality = 'unknown';
+              displayType = effectiveType;
+          }
+          
+          document.getElementById('connectionType').textContent = 
+            `${displayType} (quality: ${quality}) via ${physicalType}`;
+          document.getElementById('downlinkSpeed').textContent = `${downlink} Mbps (API estimate)`;
+          document.getElementById('rttLatency').textContent = `${rtt} ms`;
+          document.getElementById('saveDataMode').textContent = saveData ? 'Yes ⚠️' : 'No';
+          
+          log(`Network: ${displayType} (${quality}) | ${downlink} Mbps | ${rtt}ms RTT | ${physicalType}`, 'success');
+          log(`⚠️ Note: Web API caps at "4g" - cannot detect 5G or actual WiFi speeds`, 'warning');
+        } else {
+          document.getElementById('connectionType').textContent = 'API not available';
+          document.getElementById('downlinkSpeed').textContent = 'N/A';
+          document.getElementById('rttLatency').textContent = 'N/A';
+          log('Network Information API not available', 'warning');
+        }
+      } catch (e) {
+        log('Network API error: ' + e.message, 'error');
+      }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      log('🧠 RAL v4.0 Test Suite loaded', 'success');
+      log('Open DevTools Console (F12) to see RAL extension logs', 'info');
+      checkExtension();
+      checkHardware();
+    });
+    
+    // Track selections for logging
+    document.addEventListener('selectionchange', () => {
+      const selection = window.getSelection().toString().trim();
+      if (selection.length > 10) {
+        log(`📋 Selection detected: "${selection.substring(0, 50)}..."`, 'info');
+      }
+    });
+    
+    // Track copies for logging
+    document.addEventListener('copy', () => {
+      const selection = window.getSelection().toString().trim();
+      log(`📋 Copy detected: "${selection.substring(0, 50)}..."`, 'success');
+    });
+  </script>
+</body>
+</html>

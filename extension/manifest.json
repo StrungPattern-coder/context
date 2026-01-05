@@ -1,0 +1,85 @@
+{
+  "manifest_version": 3,
+  "name": "RAL - Reality Anchoring Layer",
+  "version": "3.0.0",
+  "description": "The context layer LLMs can't access. Extreme Intelligence Engine v3.0 with Topology-Based Input Finding, Global Ghost Scrubber, Reality Arbiter, and Hardware-Aware Throttling. Gives AI the reality it's missing.",
+  
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "history",
+    "clipboardRead",
+    "scripting"
+  ],
+  
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "RAL - Reality Context"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-scripts/selection-tracker.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    },
+    {
+      "matches": ["https://chat.openai.com/*", "https://chatgpt.com/*"],
+      "js": ["content-scripts/chatgpt.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://claude.ai/*"],
+      "js": ["content-scripts/ral-core.js", "content-scripts/claude.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://gemini.google.com/*", "https://bard.google.com/*"],
+      "js": ["content-scripts/ral-core.js", "content-scripts/gemini.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.perplexity.ai/*", "https://perplexity.ai/*"],
+      "js": ["content-scripts/ral-core.js", "content-scripts/perplexity.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://poe.com/*"],
+      "js": ["content-scripts/ral-core.js", "content-scripts/poe.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://huggingface.co/chat/*"],
+      "js": ["content-scripts/ral-core.js", "content-scripts/huggingchat.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://localhost/*", "http://127.0.0.1/*"],
+      "js": ["content-scripts/ral-core.js", "content-scripts/generic.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "options_page": "options/options.html"
+}

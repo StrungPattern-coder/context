@@ -1,0 +1,640 @@
+:root {
+  /* Palette: Project VOLTAGE */
+  --void: #050505;
+  --grid-color: #1a1a1a;
+  --volt: #fcee0a; /* Acid Yellow */
+  --volt-dim: rgba(252, 238, 10, 0.2);
+  --rage: #ff003c; /* Cyberpunk Red */
+  --rage-dim: rgba(255, 0, 60, 0.2);
+  --data: #00f0ff; /* Hologram Cyan */
+  --text-main: #e2e2e2;
+  --text-dim: #666;
+  
+  /* Dimensions */
+  --corner-cut: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  cursor: default;
+}
+
+body {
+  background-color: var(--void);
+  color: var(--text-main);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* --- Background Effects --- */
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5) 51%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.3;
+}
+
+.noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.options-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 2;
+  background-image: 
+    radial-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+  background-size: 4px 4px, 100% 100%;
+  min-height: 100vh;
+}
+
+/* --- Header --- */
+.cyber-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  border-bottom: 2px solid var(--grid-color);
+  padding-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-icon {
+  background: var(--volt);
+  color: var(--void);
+  font-weight: 800;
+  padding: 4px 12px;
+  font-size: 24px;
+  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+}
+
+.brand-text h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--volt);
+}
+
+.subtitle {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+.version {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-left: 8px;
+}
+
+.server-status {
+  font-size: 12px;
+  color: var(--volt);
+  border: 1px solid var(--volt);
+  padding: 4px 12px;
+  background: var(--volt-dim);
+}
+
+/* --- Cyber Cards --- */
+.cyber-card {
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid var(--grid-color);
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.cyber-card::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 20px;
+  height: 20px;
+  background: var(--volt);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed var(--grid-color);
+  padding-bottom: 8px;
+}
+
+.card-header h3 {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.section-desc {
+  color: var(--text-dim);
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+
+/* --- Radio Groups --- */
+.radio-group {
+  display: grid;
+  gap: 16px;
+}
+
+.radio-option {
+  display: flex;
+  cursor: pointer;
+  position: relative;
+}
+
+.radio-option input {
+  position: absolute;
+  opacity: 0;
+}
+
+.radio-content {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--grid-color);
+  background: rgba(0,0,0,0.3);
+  transition: all 0.2s;
+}
+
+.radio-option input:checked + .radio-content {
+  border-color: var(--volt);
+  background: var(--volt-dim);
+  box-shadow: 0 0 15px rgba(252, 238, 10, 0.1);
+}
+
+.radio-title {
+  display: block;
+  font-weight: 700;
+  color: var(--volt);
+  margin-bottom: 4px;
+}
+
+.radio-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.radio-option input:checked + .radio-content .radio-desc {
+  color: var(--text-main);
+}
+
+/* --- Forms --- */
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.input-with-button, .input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #000;
+  border: 1px solid var(--grid-color);
+  padding: 0 12px;
+}
+
+.prompt {
+  color: var(--volt);
+  margin-right: 12px;
+  font-weight: 700;
+}
+
+input[type="url"], input[type="password"] {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 12px 0;
+  color: var(--text-main);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  text-transform: none; /* Allow normal case for URLs/Keys */
+}
+
+.cyber-btn {
+  padding: 8px 16px;
+  background: var(--volt-dim);
+  border: 1px solid var(--volt);
+  color: var(--volt);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.1s;
+  text-transform: uppercase;
+  margin-left: 12px;
+}
+
+.cyber-btn:hover {
+  background: var(--volt);
+  color: var(--void);
+  box-shadow: 0 0 15px var(--volt-dim);
+}
+
+.cyber-btn.primary {
+  width: 100%;
+  padding: 16px;
+  font-size: 14px;
+  margin-left: 0;
+}
+
+/* --- Checkboxes --- */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.checkbox-option input {
+  display: none;
+}
+
+.checkbox-box {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--grid-color);
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.checkbox-option input:checked + .checkbox-box {
+  background: var(--volt);
+  border-color: var(--volt);
+  box-shadow: 0 0 8px var(--volt-dim);
+}
+
+.checkbox-option input:checked + .checkbox-box::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--void);
+}
+
+.checkbox-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkbox-label {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.checkbox-desc {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* --- Toggle Switches --- */
+.toggle-row {
+  margin-bottom: 16px;
+}
+
+.toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.toggle-option input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 48px;
+  height: 24px;
+  background: #000;
+  border: 1px solid var(--grid-color);
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: var(--text-dim);
+  top: 2px;
+  left: 2px;
+  transition: all 0.2s;
+}
+
+.toggle-option input:checked + .toggle-slider {
+  border-color: var(--volt);
+  background: var(--volt-dim);
+}
+
+.toggle-option input:checked + .toggle-slider::after {
+  background: var(--volt);
+  left: 26px;
+  box-shadow: 0 0 8px var(--volt);
+}
+
+.toggle-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle-label {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.toggle-desc {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.master-toggle {
+  padding: 8px 0;
+}
+
+.master-toggle .toggle-label {
+  color: var(--volt);
+  font-size: 14px;
+}
+
+/* --- Form inputs --- */
+input[type="text"], input[type="number"], textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 12px 0;
+  color: var(--text-main);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  text-transform: none;
+  resize: vertical;
+}
+
+textarea {
+  min-height: 60px;
+}
+
+/* --- Stats Grid --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 16px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--grid-color);
+}
+
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--data);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* --- Badges --- */
+.badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  background: var(--rage-dim);
+  border: 1px solid var(--rage);
+  color: var(--rage);
+}
+
+.badge.experimental {
+  background: rgba(100, 100, 100, 0.2);
+  border-color: var(--text-dim);
+  color: var(--text-dim);
+}
+
+/* --- Highlighted Cards --- */
+.cyber-card.highlight {
+  border-color: var(--data);
+}
+
+.cyber-card.highlight::after {
+  background: var(--data);
+}
+
+.cyber-card.dimmed {
+  opacity: 0.6;
+}
+
+.checkbox-option.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* --- Button Variants --- */
+.cyber-btn.secondary {
+  background: transparent;
+  border-color: var(--text-dim);
+  color: var(--text-dim);
+  margin-left: 0;
+}
+
+.cyber-btn.secondary:hover {
+  background: var(--text-dim);
+  color: var(--void);
+}
+
+.cyber-btn.danger {
+  background: transparent;
+  border-color: var(--rage);
+  color: var(--rage);
+  margin-left: 0;
+}
+
+.cyber-btn.danger:hover {
+  background: var(--rage);
+  color: white;
+}
+
+.cyber-btn.small {
+  padding: 6px 12px;
+  font-size: 10px;
+}
+
+/* --- Action Row --- */
+.action-row {
+  margin-top: 40px;
+  display: flex;
+  gap: 12px;
+}
+
+.action-row .cyber-btn.primary {
+  flex: 1;
+}
+
+/* --- Server Status Variants --- */
+.server-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--volt);
+  border: 1px solid var(--volt);
+  padding: 4px 12px;
+  background: var(--volt-dim);
+}
+
+.server-status.connected {
+  color: var(--data);
+  border-color: var(--data);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.server-status.warning {
+  color: var(--rage);
+  border-color: var(--rage);
+  background: var(--rage-dim);
+}
+
+.server-status.disabled {
+  color: var(--text-dim);
+  border-color: var(--text-dim);
+  background: rgba(100, 100, 100, 0.1);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* --- Connection Result --- */
+.connection-result {
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  display: none;
+}
+
+.connection-result.success {
+  display: block;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid var(--data);
+  color: var(--data);
+}
+
+.connection-result.error {
+  display: block;
+  background: var(--rage-dim);
+  border: 1px solid var(--rage);
+  color: var(--rage);
+}
+
+/* --- Toast Notification --- */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--volt);
+  color: var(--void);
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 13px;
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.toast.success {
+  background: var(--volt);
+  color: var(--void);
+}
+
+.toast.error {
+  background: var(--rage);
+  color: white;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-row {
+    flex-direction: column;
+  }
+  
+  .cyber-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+}

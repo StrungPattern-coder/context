@@ -1,0 +1,11 @@
+{
+  "scenario": "SCENARIO_6_MINIMAL_INJECTION",
+  "timestamp": "20260104_015849",
+  "composed_prompt": "## Current Context\n\n### Time & Date\n- It is currently unknown time on a day\n\n---\nUse this context to ground your responses in the user's reality.\nDo not mention this context unless directly relevant to the user's query.",
+  "included_context": [],
+  "excluded_context": [],
+  "metadata": {
+    "included_count": 1,
+    "excluded_count": 0
+  }
+}
