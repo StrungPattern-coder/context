@@ -59,6 +59,11 @@ const DEFAULT_SETTINGS = {
   includePageContent: true,      // Active page context
   includeUserProfile: true,      // Persistent memory
   
+  // v4.0+ NEW CONTEXT FEATURES
+  includeSonicBridge: true,      // "The Sonic Bridge" - YouTube/Meet captions
+  includeRichTabContext: true,   // "Rich Tab Context" - Active resources
+  includeHistorySummary: true,   // "Temporal Context" - History summary
+  
   // Future Context
   includeLocation: false,
   includeWeather: false,
@@ -1309,7 +1314,79 @@ async function generateDeepContext(settings) {
     }
   }
   
+  // =========================================================================
+  // KILLER FEATURE #4: "The Sonic Bridge" - Live Video Captions
+  // Captures captions from YouTube and Google Meet
+  // Supports "pause and ask" workflow - captures currently visible caption
+  // =========================================================================
+  if (settings.includeSonicBridge !== false) {
+    try {
+      const sonicData = await getSonicBridgeCaptions();
+      // Check for 'rawCaptions' (matches sonic-bridge.js)
+      if (sonicData && sonicData.rawCaptions && sonicData.rawCaptions.length > 0) {
+        context.sonicBridge = {
+          platform: sonicData.platform,
+          captionCount: sonicData.captionCount,
+          bufferDuration: sonicData.durationMs,
+          // The current/last caption (what user likely paused on)
+          currentCaption: sonicData.currentCaption || null,
+          // Format recent captions for context
+          recentCaptions: sonicData.rawCaptions.map(c => ({
+            text: c.text,
+            speaker: c.speaker,
+            timeAgo: formatTimeAgo(c.timestamp)
+          })).slice(-10) // Last 10 captions
+        };
+        console.log('RAL: Sonic Bridge captured', context.sonicBridge.captionCount, 'captions');
+        if (sonicData.currentCaption) {
+          console.log('RAL: Current caption (paused on):', sonicData.currentCaption.text.substring(0, 50));
+        }
+      }
+    } catch (e) {
+      console.warn('RAL: Error getting Sonic Bridge captions', e);
+    }
+  }
+  
+  // =========================================================================
+  // KILLER FEATURE #5: "Rich Tab Context" - Active Resources
+  // Top 5 non-AI tabs the user has open, sorted by recency
+  // =========================================================================
+  if (settings.includeRichTabContext !== false) {
+    try {
+      const richTabContext = await getRichTabContext();
+      if (richTabContext) {
+        context.richTabContext = richTabContext;
+      }
+    } catch (e) {
+      console.warn('RAL: Error getting Rich Tab Context', e);
+    }
+  }
+  
+  // =========================================================================
+  // KILLER FEATURE #6: "Temporal Context" - Recent History Summary
+  // History from the past hour, grouped by domain
+  // =========================================================================
+  if (settings.includeHistorySummary !== false) {
+    try {
+      const historySummary = await getHistorySummary();
+      if (historySummary) {
+        context.historySummary = historySummary;
+      }
+    } catch (e) {
+      console.warn('RAL: Error getting History Summary', e);
+    }
+  }
+  
   return context;
+}
+
+// Helper function for Sonic Bridge timestamp formatting
+function formatTimeAgo(timestamp) {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  return `${Math.floor(minutes / 60)}h ago`;
 }
 
 
@@ -2070,6 +2147,59 @@ function buildMultimodalContextWrapper(deepContext) {
     });
   }
   
+  // =========================================================================
+  // SONIC BRIDGE SECTION - Live Captions from YouTube/Google Meet
+  // Supports "pause and ask" workflow - shows current caption prominently
+  // =========================================================================
+  if (deepContext.sonicBridge && deepContext.sonicBridge.captionCount > 0) {
+    const bridge = deepContext.sonicBridge;
+    const sonicContent = [];
+    
+    sonicContent.push(`Platform: ${bridge.platform}`);
+    
+    // Show the CURRENT caption prominently (what user likely paused on)
+    if (bridge.currentCaption) {
+      const current = bridge.currentCaption;
+      const ageLabel = current.ageMs < 60000 
+        ? `${Math.round(current.ageMs / 1000)}s ago` 
+        : `${Math.round(current.ageMs / 60000)}m ago`;
+      const speaker = current.speaker ? `[${current.speaker}] ` : '';
+      sonicContent.push(`CURRENT (paused on): ${speaker}"${current.text}" (${ageLabel})`);
+    }
+    
+    // Show recent captions for context
+    sonicContent.push(`Recent Captions (${bridge.captionCount} total):`);
+    bridge.recentCaptions.forEach(caption => {
+      const speaker = caption.speaker ? `[${caption.speaker}] ` : '';
+      sonicContent.push(`  ${speaker}${caption.text} (${caption.timeAgo})`);
+    });
+    
+    sections.push({
+      tag: 'video_captions',
+      content: sonicContent.join('\n')
+    });
+  }
+  
+  // =========================================================================
+  // RICH TAB CONTEXT SECTION - Active Resources
+  // =========================================================================
+  if (deepContext.richTabContext) {
+    sections.push({
+      tag: 'active_resources',
+      content: deepContext.richTabContext
+    });
+  }
+  
+  // =========================================================================
+  // TEMPORAL CONTEXT SECTION - Recent History Summary
+  // =========================================================================
+  if (deepContext.historySummary) {
+    sections.push({
+      tag: 'recent_activity',
+      content: deepContext.historySummary
+    });
+  }
+  
   return sections;
 }
 
@@ -2281,6 +2411,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     'TAB_CONTEXT_UPDATE': () => {
       updateTabContext(sender.tab?.id, message.payload);
       sendResponse({ success: true });
+    },
+    
+    // =========================================================================
+    // NEW FEATURES: Rich Tab Context, History Summary, Sonic Bridge
+    // =========================================================================
+    
+    // Feature: "Rich Tab Context" - Get active resources
+    'GET_RICH_TAB_CONTEXT': async () => {
+      const richTabContext = await getRichTabContext();
+      sendResponse({ success: true, richTabContext });
+    },
+    
+    // Feature: "Temporal Context" / History Summary
+    'GET_HISTORY_SUMMARY': async () => {
+      const historySummary = await getHistorySummary();
+      sendResponse({ success: true, historySummary });
+    },
+    
+    // Feature: "Sonic Bridge" - Get video captions
+    'GET_SONIC_BRIDGE_CAPTIONS': async () => {
+      const captions = await getSonicBridgeCaptions();
+      sendResponse({ success: true, captions });
+    },
+    
+    // Get all new context features at once
+    'GET_ENHANCED_CONTEXT': async () => {
+      const [richTabContext, historySummary, sonicBridgeCaptions] = await Promise.all([
+        getRichTabContext(),
+        getHistorySummary(),
+        getSonicBridgeCaptions()
+      ]);
+      
+      sendResponse({
+        success: true,
+        richTabContext,
+        historySummary,
+        sonicBridgeCaptions
+      });
     },
   };
   
@@ -2688,6 +2856,356 @@ function cleanupOldResearchThreads() {
     if (data.lastUpdate < tenMinutesAgo) {
       globalRealityMap.activeTabs.delete(tabId);
     }
+  }
+}
+
+// ============================================================================
+// FEATURE: "Rich Tab Context" - Active resources the user is using
+// ============================================================================
+
+/**
+ * Excluded domains for Rich Tab Context
+ * These are AI chat sites and localhost that should be filtered out
+ */
+const RICH_TAB_EXCLUDED_DOMAINS = [
+  'chatgpt.com',
+  'chat.openai.com',
+  'claude.ai',
+  'gemini.google.com',
+  'bard.google.com',
+  'perplexity.ai',
+  'poe.com',
+  'huggingface.co',
+  'localhost',
+  '127.0.0.1',
+];
+
+/**
+ * Clean URL by stripping tracking parameters
+ * Removes ?utm_*, ?ref, ?source, etc.
+ */
+function cleanUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    const paramsToRemove = [];
+    
+    // Find tracking parameters to remove
+    for (const [key] of urlObj.searchParams) {
+      if (key.startsWith('utm_') || 
+          key === 'ref' || 
+          key === 'source' ||
+          key === 'fbclid' ||
+          key === 'gclid' ||
+          key === 'mc_cid' ||
+          key === 'mc_eid') {
+        paramsToRemove.push(key);
+      }
+    }
+    
+    // Remove the tracking parameters
+    paramsToRemove.forEach(param => urlObj.searchParams.delete(param));
+    
+    return urlObj.toString();
+  } catch (e) {
+    return url;
+  }
+}
+
+/**
+ * Check if a URL should be excluded from Rich Tab Context
+ */
+function isExcludedDomain(url) {
+  try {
+    const hostname = new URL(url).hostname;
+    return RICH_TAB_EXCLUDED_DOMAINS.some(domain => hostname.includes(domain));
+  } catch (e) {
+    return true; // Exclude invalid URLs
+  }
+}
+
+/**
+ * Feature: "Rich Tab Context"
+ * Returns a Markdown-formatted list of top 5 active resources the user is using
+ * 
+ * @returns {Promise<string>} Markdown string of active tabs
+ */
+async function getRichTabContext() {
+  try {
+    // Get all tabs
+    const allTabs = await chrome.tabs.query({});
+    
+    // Get the current active tab to exclude it
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const activeTabId = activeTab?.id;
+    
+    // Filter and process tabs
+    const filteredTabs = allTabs
+      .filter(tab => {
+        // Exclude the current active tab
+        if (tab.id === activeTabId) return false;
+        
+        // Exclude tabs without URLs
+        if (!tab.url) return false;
+        
+        // Exclude chrome:// and extension pages
+        if (tab.url.startsWith('chrome://') || 
+            tab.url.startsWith('chrome-extension://') ||
+            tab.url.startsWith('about:')) {
+          return false;
+        }
+        
+        // Exclude AI chat sites and localhost
+        if (isExcludedDomain(tab.url)) return false;
+        
+        return true;
+      })
+      .map(tab => ({
+        title: tab.title || 'Untitled',
+        url: cleanUrl(tab.url),
+        lastAccessed: tab.lastAccessed || 0,
+        id: tab.id
+      }))
+      // Sort by lastAccessed (most recent first)
+      .sort((a, b) => b.lastAccessed - a.lastAccessed)
+      // Take top 5
+      .slice(0, 5);
+    
+    // If no tabs, return empty message
+    if (filteredTabs.length === 0) {
+      return 'No other active resources detected.';
+    }
+    
+    // Format as Markdown numbered list
+    const markdownList = filteredTabs
+      .map((tab, index) => {
+        // Truncate long titles
+        const title = tab.title.length > 60 
+          ? tab.title.substring(0, 57) + '...' 
+          : tab.title;
+        return `${index + 1}. [${title}](${tab.url})`;
+      })
+      .join('\n');
+    
+    return markdownList;
+  } catch (error) {
+    console.error('RAL: Error getting rich tab context:', error);
+    return 'Unable to retrieve tab context.';
+  }
+}
+
+// ============================================================================
+// FEATURE: "Temporal Context" - History summary from the past hour
+// ============================================================================
+
+/**
+ * Feature: "Temporal Context" / History Summary
+ * Returns a summary of user activity from the past hour, grouped by domain
+ * 
+ * @returns {Promise<string>} Summary string like "StackOverflow (4 visits), GitHub (2 visits)"
+ */
+async function getHistorySummary() {
+  try {
+    // Calculate 1 hour ago
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    
+    // Search history from the past hour
+    const historyItems = await chrome.history.search({
+      text: '',           // Empty string matches all
+      startTime: oneHourAgo,
+      maxResults: 100     // Get enough results to summarize
+    });
+    
+    // Group by domain and count visits
+    const domainCounts = {};
+    
+    for (const item of historyItems) {
+      if (!item.url) continue;
+      
+      try {
+        const urlObj = new URL(item.url);
+        const hostname = urlObj.hostname;
+        
+        // Skip chrome:// pages, extensions, and empty hostnames
+        if (hostname.startsWith('chrome') || 
+            hostname.includes('extension') ||
+            hostname === '' ||
+            hostname === 'newtab') {
+          continue;
+        }
+        
+        // Skip excluded domains (AI sites, localhost)
+        if (isExcludedDomain(item.url)) continue;
+        
+        // Clean up domain name for display
+        let displayName = hostname
+          .replace('www.', '')
+          .replace('.com', '')
+          .replace('.org', '')
+          .replace('.io', '')
+          .replace('.dev', '');
+        
+        // Capitalize first letter
+        displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+        
+        // Special cases for known domains
+        const domainMappings = {
+          'stackoverflow': 'StackOverflow',
+          'github': 'GitHub',
+          'gitlab': 'GitLab',
+          'youtube': 'YouTube',
+          'reddit': 'Reddit',
+          'twitter': 'Twitter',
+          'x': 'Twitter/X',
+          'linkedin': 'LinkedIn',
+          'medium': 'Medium',
+          'dev': 'Dev.to',
+          'hashnode': 'Hashnode',
+          'google': 'Google',
+          'docs.google': 'Google Docs',
+          'drive.google': 'Google Drive',
+          'mail.google': 'Gmail',
+          'notion': 'Notion',
+          'figma': 'Figma',
+          'slack': 'Slack',
+          'discord': 'Discord',
+          'npmjs': 'npm',
+          'pypi': 'PyPI',
+          'crates': 'crates.io'
+        };
+        
+        // Check if we have a mapping
+        for (const [key, value] of Object.entries(domainMappings)) {
+          if (hostname.includes(key)) {
+            displayName = value;
+            break;
+          }
+        }
+        
+        // Count visits
+        domainCounts[displayName] = (domainCounts[displayName] || 0) + 1;
+        
+      } catch (e) {
+        // Skip invalid URLs
+        continue;
+      }
+    }
+    
+    // Sort by visit count (descending) and format
+    const sortedDomains = Object.entries(domainCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10); // Top 10 domains
+    
+    // If no history, return appropriate message
+    if (sortedDomains.length === 0) {
+      return 'No browsing activity in the past hour.';
+    }
+    
+    // Format as "Domain (X visits)" string
+    const summary = sortedDomains
+      .map(([domain, count]) => `${domain} (${count} visit${count !== 1 ? 's' : ''})`)
+      .join(', ');
+    
+    return summary;
+  } catch (error) {
+    console.error('RAL: Error getting history summary:', error);
+    return 'Unable to retrieve browsing history.';
+  }
+}
+
+// ============================================================================
+// FEATURE: Get Sonic Bridge Captions from active tab
+// ============================================================================
+
+/**
+ * Get captions from the Sonic Bridge content script
+ * Searches ALL open video platform tabs, not just the active one
+ * Auto-injects content script if not already loaded
+ * @returns {Promise<object|null>} Caption data or null
+ */
+async function getSonicBridgeCaptions() {
+  console.log('RAL Sonic Bridge: getSonicBridgeCaptions() called');
+  
+  try {
+    // Query ALL tabs on video platforms (not just active tab)
+    const videoPlatforms = ['youtube.com', 'youtu.be', 'meet.google.com'];
+    const allTabs = await chrome.tabs.query({});
+    
+    console.log(`RAL Sonic Bridge: Found ${allTabs.length} total tabs`);
+    
+    const videoTabs = allTabs.filter(tab => 
+      tab.url && videoPlatforms.some(p => tab.url.includes(p))
+    );
+    
+    if (videoTabs.length === 0) {
+      console.log('RAL Sonic Bridge: No video platform tabs found');
+      return null;
+    }
+    
+    console.log(`RAL Sonic Bridge: Found ${videoTabs.length} video tab(s):`, videoTabs.map(t => t.url));
+    
+    // Try to get captions from each video tab
+    for (const tab of videoTabs) {
+      try {
+        console.log(`RAL Sonic Bridge: Sending message to tab ${tab.id} (${tab.url})`);
+        
+        // Use Promise with timeout to avoid hanging
+        const response = await Promise.race([
+          chrome.tabs.sendMessage(tab.id, { type: 'GET_SONIC_BRIDGE_CAPTIONS' }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
+        ]);
+        
+        console.log(`RAL Sonic Bridge: Response from tab ${tab.id}:`, response);
+        
+        // Response structure: { success: true, captions: { platform, captionCount, durationMs, text, rawCaptions } }
+        if (response?.success && response?.captions) {
+          const captions = response.captions;
+          if (captions.rawCaptions && captions.rawCaptions.length > 0) {
+            console.log(`RAL Sonic Bridge: SUCCESS! Got ${captions.captionCount} captions from ${tab.url}`);
+            return captions; // Return the captions object directly
+          } else {
+            console.log(`RAL Sonic Bridge: Tab ${tab.id} has empty caption buffer`);
+          }
+        } else {
+          console.log(`RAL Sonic Bridge: Tab ${tab.id} returned invalid response:`, response);
+        }
+      } catch (e) {
+        // Content script not loaded - try to inject it
+        console.log(`RAL Sonic Bridge: Could not reach tab ${tab.id}: ${e.message}, attempting to inject script...`);
+        
+        try {
+          // Inject the content script
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['content-scripts/sonic-bridge.js']
+          });
+          console.log(`RAL Sonic Bridge: Injected script into tab ${tab.id}, waiting for init...`);
+          
+          // Wait a moment for the script to initialize
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Try again
+          const retryResponse = await Promise.race([
+            chrome.tabs.sendMessage(tab.id, { type: 'GET_SONIC_BRIDGE_CAPTIONS' }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
+          ]);
+          
+          if (retryResponse?.success && retryResponse?.captions?.rawCaptions?.length > 0) {
+            console.log(`RAL Sonic Bridge: SUCCESS after injection! Got ${retryResponse.captions.captionCount} captions`);
+            return retryResponse.captions;
+          } else {
+            console.log(`RAL Sonic Bridge: Script injected but no captions yet (buffer may be empty)`);
+          }
+        } catch (injectError) {
+          console.log(`RAL Sonic Bridge: Could not inject script into tab ${tab.id}:`, injectError.message);
+        }
+      }
+    }
+    
+    console.log('RAL Sonic Bridge: No captions found in any video tab');
+    return null;
+  } catch (e) {
+    console.warn('RAL Sonic Bridge: Error getting captions', e);
+    return null;
   }
 }
 
