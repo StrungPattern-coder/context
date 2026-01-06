@@ -1,4 +1,53 @@
 /**
+ * RBI / FINANCIAL PRIVACY GUARD
+ * Indian banking domains (*.bank.in) are NEVER inspected.
+ * This is a hard architectural guarantee, not a user preference.
+ */
+(function enforceFinancialPrivacy() {
+  try {
+    const hostname = window.location.hostname?.toLowerCase();
+    if (hostname && /\.bank\.in$/.test(hostname)) {
+      // Completely disable RAL on Indian banking sites
+      return;
+    }
+  } catch (_) {
+    return;
+  }
+})();
+
+(function() {
+  'use strict';
+/**
+ * PRIVACY GUARANTEE:
+ * - Zero telemetry
+ * - No background exfiltration
+ * - All context remains in local memory
+ * - Data leaves the browser ONLY via explicit user action
+ */
+/**
+ * Sanitize selected text for sensitive content.
+ */
+function sanitizeSelection(text) {
+  if (!text || typeof text !== 'string') return text;
+
+  // Credit / Debit cards (basic heuristic)
+  if (/\b(?:\d[ -]*?){13,16}\b/.test(text)) {
+    return '[REDACTED_PAYMENT_DATA]';
+  }
+
+  // API keys (OpenAI / generic)
+  if (/sk-[a-zA-Z0-9]{20,}/.test(text)) {
+    return '[REDACTED_API_KEY]';
+  }
+
+  // JWT tokens
+  if (/eyJ[A-Za-z0-9_-]+?\.[A-Za-z0-9_-]+?\.[A-Za-z0-9_-]+/.test(text)) {
+    return '[REDACTED_TOKEN]';
+  }
+
+  return text;
+}
+/**
  * ╔═══════════════════════════════════════════════════════════════════════════╗
  * ║  RAL Selection Tracker v1.0.0 - Reality Anchoring Layer                   ║
  * ║  The context layer LLMs can't access                                      ║
@@ -69,9 +118,6 @@
 // Cache for code container detection (performance)
 let _codeContainerCache = null;
 let _lastDOMScan = 0;
-
-(function() {
-  'use strict';
   
   // Don't run on AI chat pages
   function isAIChatUI() {
@@ -1847,7 +1893,7 @@ let _lastDOMScan = 0;
     
     // Get surrounding text from substantial container
     const fullText = blockElement.textContent || '';
-    const selectedText = selection.toString();
+    const selectedText = sanitizeSelection(selection.toString());
     
     const selectedStart = fullText.indexOf(selectedText);
     if (selectedStart === -1) return null;

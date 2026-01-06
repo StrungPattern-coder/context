@@ -1,318 +1,148 @@
 # Reality Anchoring Layer (RAL)
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/raldev/ral/releases)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Status](https://img.shields.io/badge/status-active--development-orange.svg)](#)
+[![Platform](https://img.shields.io/badge/platform-browser--native-success.svg)](#)
 
-**The context layer LLMs can't access.**
+> **Reality-aware context injection infrastructure for AI systems.**
 
-RAL is a browser extension that gives AI systems awareness of your real-world reality - what you're looking at, what you've copied, what you're struggling with, and what you're researching across tabs.
+Reality Anchoring Layer (RAL) is a browser-native intelligence layer that gives AI systems awareness of a user’s **time, activity, intent, and working context** — automatically and continuously, without requiring the user to manually explain their situation.
 
-> **Version 1.0.0** - First stable release. "Extreme Intelligence Engine" is production-ready.
-
----
-
-## 🎯 What is RAL?
-
-Reality Anchoring Layer is infrastructure that:
-
-- **Maintains** a user's temporal, spatial, and situational context
-- **Reasons** about that context semantically
-- **Resolves** ambiguous human references ("today", "now", "here")
-- **Injects** minimal required context into LLM prompts
-- **Works** across sessions, devices, and AI providers
-- **Gives users** full visibility and control
-
-Think of it as **Auth0 for context** or **Segment for reality awareness**.
+RAL augments prompts sent to existing AI tools such as ChatGPT, Claude, Gemini, and local or open-source models.
 
 ---
 
-## 🏗️ Architecture
+## Motivation
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Client Apps    │────▶│   RAL Core API  │────▶│  LLM Providers  │
-└─────────────────┘     └────────┬────────┘     └─────────────────┘
-                                 │
-         ┌───────────────────────┼───────────────────────┐
-         │                       │                       │
-    ┌────▼────┐            ┌─────▼─────┐           ┌─────▼─────┐
-    │Temporal │            │  Context  │           │  Prompt   │
-    │ Engine  │            │  Memory   │           │Composition│
-    └─────────┘            └───────────┘           └───────────┘
-```
+Large language models are powerful but fundamentally stateless.
 
-See [Architecture Documentation](docs/ARCHITECTURE.md) for full details.
+They do not know:
+- What the user was just reading or copying
+- Which error the user is currently stuck on
+- Whether the user is studying, debugging, or rushing
+- What tabs, topics, or projects are active
+- When context has shifted across tasks
+
+RAL bridges this gap by compiling **real-time user reality** into structured, relevance-scored context that AI systems can consume reliably.
 
 ---
 
-## 🚀 Quick Start
+## What RAL Is
 
-### Option 1: Browser Extension (Fastest - No Server Required)
+RAL is **infrastructure**, not a chatbot.
 
-```bash
-# 1. Load the extension in Chrome
-# Go to chrome://extensions → Enable Developer Mode → Load Unpacked → Select /extension folder
+It operates as a reality compiler between the browser and AI systems:
+- Observes user interaction signals
+- Synthesizes a unified “active reality”
+- Applies decay logic to prevent stale context
+- Adjusts system instructions based on cognitive state
 
-# 2. That's it! The extension works standalone with local context processing
-```
-
-Supports: ChatGPT, Claude, Gemini, Perplexity, Poe, HuggingChat, Local LLMs (Ollama)
-
-### Option 2: One-Click Docker Deployment
-
-```bash
-# Full production stack
-./scripts/deploy.sh deploy
-
-# Development mode (dependencies only)
-./scripts/deploy.sh dev
-
-# View logs
-./scripts/deploy.sh logs
-```
-
-### Option 3: Local Development
-
-```bash
-# Start infrastructure
-docker compose -f docker/docker-compose.yml up -d db redis
-
-# Setup Python environment
-cd services/ral-core
-poetry install
-
-# Run database migrations
-poetry run alembic upgrade head
-
-# Start the API server
-poetry run uvicorn app.main:app --reload --port 8000
-```
-
-Services will be available at:
-- RAL Core API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
-- Universal Endpoint: http://localhost:8000/api/v0/universal/augment
+No new UI. No workflow changes.
 
 ---
 
-## Hybrid Architecture
+## Core Capabilities
 
-RAL supports three operating modes:
+### Reality Anchoring
+- Tracks selections, copies, and active page context
+- Scores relevance based on recency and intent
+- Automatically deprioritizes stale information
 
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| **Local** | All processing in browser | Privacy-first, offline |
-| **Hybrid** | Local + server sync | Best of both worlds |
-| **Server** | Full server processing | Team/enterprise features |
+### Cross-Tab Reality Mapping
+- Maintains unified context across tabs
+- Detects multi-tab research threads
+- Resolves conflicting intents across pages
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     RAL Hybrid System                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐                    ┌─────────────┐        │
-│  │   Browser   │◄──────────────────►│  RAL Server │        │
-│  │  Extension  │   Sync (Optional)  │   (API)     │        │
-│  └─────────────┘                    └─────────────┘        │
-│        │                                   │               │
-│        ▼                                   ▼               │
-│  ┌─────────────┐                    ┌─────────────┐        │
-│  │ Local RAL   │                    │ Universal   │        │
-│  │  Engine     │                    │  Endpoint   │        │
-│  └─────────────┘                    └─────────────┘        │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+### Temporal Intelligence
+- Understands local time, date, and day-part
+- Resolves relative references like “earlier today”
 
----
+### Behavioral Awareness
+- Detects frustration, deep study, skimming, and rapid debugging
+- Dynamically adjusts AI system instructions
 
-## SDKs
+### Persistent User Memory
+- Learns technical stack and recurring topics
+- Tracks current project and task context
+- Improves relevance over time
 
-### Python SDK
-
-```bash
-pip install ral-sdk
-```
-
-```python
-from ral_sdk import RAL
-
-ral = RAL(server_url="https://ral.example.com")
-response = ral.augment("What should I focus on?", provider="openai")
-
-# Use with any AI client
-messages = [
-    {"role": "system", "content": response.system_context},
-    {"role": "user", "content": response.user_prompt}
-]
-```
-
-### JavaScript SDK
-
-```bash
-npm install ral-sdk
-```
-
-```typescript
-import { RAL } from 'ral-sdk';
-
-const ral = new RAL({ serverUrl: 'https://ral.example.com' });
-const response = await ral.augment('What should I focus on?', { provider: 'openai' });
-```
+### Privacy by Default
+- All processing is local by default
+- No data leaves the browser unless configured
+- Server features are optional
 
 ---
 
-## Project Structure
+## User Experience
 
-```
-ral/
-├── docs/                          # Documentation
-│   ├── PHILOSOPHY.md              # Design philosophy
-│   ├── ARCHITECTURE.md            # System architecture
-│   └── API.md                     # API reference
-│
-├── services/                      # Backend services
-│   └── ral-core/                  # Core RAL service
-│       ├── app/
-│       │   ├── api/               # API endpoints
-│       │   ├── core/              # Core configuration
-│       │   ├── engines/           # Context engines
-│       │   ├── models/            # Data models
-│       │   ├── services/          # Business logic
-│       │   └── adapters/          # LLM adapters
-│       ├── tests/                 # Test suite
-│       └── alembic/               # Database migrations
-│
-├── dashboard/                     # Web dashboard (React)
-│   ├── src/
-│   │   ├── components/            # UI components
-│   │   ├── pages/                 # Page components
-│   │   ├── services/              # API clients
-│   │   └── types/                 # TypeScript types
-│   └── public/                    # Static assets
-│
-├── sdks/                          # Client SDKs
-│   ├── python/                    # Python SDK
-│   └── javascript/                # JavaScript/TypeScript SDK
-│
-├── infrastructure/                # Infrastructure as code
-│   ├── docker/                    # Docker configurations
-│   ├── kubernetes/                # K8s manifests
-│   └── terraform/                 # Cloud provisioning
-│
-└── docker-compose.yml             # Local development setup
-```
+After installation:
+1. Open an AI tool
+2. Ask a question normally
+3. The AI receives relevant situational context automatically
+
+No prompt engineering required.
 
 ---
 
-## 🔧 Core Features
+## Installation (Browser Extension)
 
-### Context Types
+RAL is currently distributed as a developer-focused unpacked extension.
 
-| Type | Description |
-|------|-------------|
-| **Temporal** | Time, date, timezone, relative references |
-| **Spatial** | Location, locale, cultural defaults |
-| **Situational** | Ongoing tasks, conversation continuity |
-| **Meta** | Confidence scores, freshness, source |
+1. Clone this repository
+2. Open `chrome://extensions`
+3. Enable **Developer Mode**
+4. Click **Load Unpacked**
+5. Select the `extension/` directory
 
-### Key Capabilities
-
-- ✅ Timezone-aware temporal reasoning
-- ✅ Ambiguous reference resolution ("today", "now", "earlier")
-- ✅ Confidence-scored assumptions
-- ✅ Context decay and freshness tracking
-- ✅ Drift and conflict detection
-- ✅ Minimal prompt injection
-- ✅ User control dashboard
-- ✅ Multi-tenant architecture
-- ✅ Model-agnostic design
+The extension activates automatically on supported platforms.
 
 ---
 
-## API Examples
+## Supported AI Platforms
 
-### Anchor Context
+- ChatGPT (works the best)
+- Claude
+- Gemini
+- Perplexity
+- Poe
+- HuggingChat
+- Ollama / LM Studio (local models)
 
-```bash
-curl -X POST http://localhost:8000/v1/context/anchor \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": "user_123",
-    "signals": {
-      "timestamp": "2026-01-03T16:12:00+05:30",
-      "locale": "en-IN"
-    },
-    "message": "Remind me about the meeting tomorrow"
-  }'
-```
-
-### Compose Prompt
-
-```bash
-curl -X POST http://localhost:8000/v1/prompt/compose \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": "user_123",
-    "original_prompt": "What should I do today?",
-    "provider": "openai"
-  }'
-```
+Injection format is selected automatically per platform.
 
 ---
 
-## Security
+## System Architecture
 
-- JWT-based authentication
-- Tenant isolation
-- Encryption at rest and in transit
-- Audit logging
-- GDPR-compliant data handling
+```text
+┌──────────────┐
+│   Browser    │
+│   (User)     │
+└─────┬────────┘
+      │
+      ▼
+┌──────────────────────────┐
+│  RAL Browser Extension   │
+│  (Service Worker)        │
+│                          │
+│  • Selection Tracking    │
+│  • Reality Fusion Engine │
+│  • Behavioral Analysis   │
+│  • Context Decay         │
+│  • Prompt Injection      │
+└─────┬────────────────────┘
+      │
+      ▼
+┌──────────────────────────┐
+│   AI System (LLM)        │
+│  ChatGPT / Claude / etc. │
+└──────────────────────────┘
 
----
-
-## Documentation
-
-- [Philosophy & Design](docs/PHILOSOPHY.md)
-- [System Architecture](docs/ARCHITECTURE.md)
-- [API Reference](docs/API.md)
-- [SDK Documentation](sdks/README.md)
-- [Deployment Guide](infrastructure/README.md)
-
----
-
-## Testing
-
-```bash
-# Run all tests
-cd services/ral-core
-pytest
-
-# Run with coverage
-pytest --cov=app --cov-report=html
-
-# Run specific test module
-pytest tests/engines/test_temporal.py
-```
+RAL reduces how much humans need to explain and increases how much AI systems actually understand.
 
 ---
 
-## Contributing
+## License
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-## Acknowledgments
-
-Built with the belief that AI should understand human reality, not require humans to explain it repeatedly.
+This project is licensed under the **Apache License 2.0**.  
+See the [LICENSE.md](LICENSE.md) file for full license text and terms.

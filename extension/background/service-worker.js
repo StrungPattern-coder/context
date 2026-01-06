@@ -85,6 +85,37 @@ const DEFAULT_SETTINGS = {
 };
 
 // ============================================================================
+// PRIVACY REDACTION SYSTEM (Financial & Sensitive Domains)
+// ============================================================================
+
+const FINANCIAL_KEYWORDS = [
+  'bank', 'wallet', 'invest',
+  'sbi', 'hdfc', 'icici', 'axis', 'kotak',
+  'zerodha', 'groww',
+  'paypal', 'stripe',
+  'finance',
+  '.bank.in' // RBI-mandated Indian banking domains
+];
+
+/**
+ * Detect financial or banking entities from a URL.
+ * Returns normalized entity name (e.g., "SBI", "HDFC") or null.
+ */
+function detectFinancialEntity(url) {
+  if (!url || typeof url !== 'string') return null;
+
+  const lowerUrl = url.toLowerCase();
+
+  for (const keyword of FINANCIAL_KEYWORDS) {
+    if (lowerUrl.includes(keyword)) {
+      return keyword.replace('.bank.in', '').toUpperCase();
+    }
+  }
+
+  return null;
+}
+
+// ============================================================================
 // SELECTION & CLIPBOARD STORAGE
 // ============================================================================
 
@@ -1173,22 +1204,42 @@ async function getRecentHistory(minutes = 60) {
       maxResults: 20
     });
     
-    // Group by domain and count visits
+    // Group by domain and count visits (with financial redaction)
     const domainCounts = {};
+    
     history.forEach(item => {
       try {
-        const domain = new URL(item.url).hostname;
-        if (!domain.includes('chrome://') && !domain.includes('newtab')) {
-          domainCounts[domain] = (domainCounts[domain] || 0) + 1;
-        }
-      } catch (e) {}
-    });
+        if (!item.url) return;
+        
+        const hostname = new URL(item.url).hostname;
+    if (hostname.includes('chrome://') || hostname.includes('newtab')) return;
+
+    const financialEntity = detectFinancialEntity(item.url);
+
+    if (financialEntity) {
+      const key = `SECURE_${financialEntity}`;
+      domainCounts[key] = (domainCounts[key] || 0) + 1;
+    } else {
+      domainCounts[hostname] = (domainCounts[hostname] || 0) + 1;
+    }
+    } catch (e) {}
+  });
     
-    // Get top domains
+    // Get top domains (secure-aware formatting)
     return Object.entries(domainCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
-      .map(([domain, visits]) => ({ domain, visits }));
+      .map(([domain, visits]) => {
+        if (domain.startsWith('SECURE_')) {
+          const entity = domain.replace('SECURE_', '');
+        return {
+          domain: `🔒 [SECURE] ${entity}`,
+          visits
+        };
+      }
+
+    return { domain, visits };
+  });
   } catch (e) {
     console.warn('RAL: Could not get history', e);
     return [];
