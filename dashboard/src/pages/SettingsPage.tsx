@@ -10,6 +10,8 @@ import {
   Copy,
   Check,
   AlertTriangle,
+  Settings,
+  Zap,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
@@ -21,19 +23,26 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'api', label: 'API Keys', icon: Key },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'danger', label: 'Danger Zone', icon: AlertTriangle },
+    { id: 'profile', label: 'PROFILE', icon: User },
+    { id: 'security', label: 'SECURITY', icon: Shield },
+    { id: 'api', label: 'API KEYS', icon: Key },
+    { id: 'notifications', label: 'ALERTS', icon: Bell },
+    { id: 'danger', label: 'DANGER', icon: AlertTriangle },
   ];
 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-slate-400 mt-1">Manage your account and preferences</p>
+        <div className="flex items-center gap-3">
+          <Settings className="w-6 h-6" style={{ color: 'var(--volt)' }} />
+          <h1 className="text-xl font-bold tracking-wider" style={{ color: 'var(--volt)' }}>
+            SYSTEM CONFIGURATION
+          </h1>
+        </div>
+        <p className="mt-1 text-xs tracking-widest" style={{ color: 'var(--text-dim)' }}>
+          MANAGE YOUR ACCOUNT AND PREFERENCES
+        </p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -44,22 +53,34 @@ export default function SettingsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-left',
-                  activeTab === tab.id
-                    ? 'bg-sky-500/10 text-sky-400'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                )}
+                className="w-full flex items-center gap-3 px-4 py-2.5 transition-all text-left border-l-2"
+                style={{
+                  borderLeftColor: activeTab === tab.id ? 'var(--volt)' : 'transparent',
+                  background: activeTab === tab.id ? 'var(--volt-dim)' : 'transparent',
+                  color: activeTab === tab.id ? 'var(--volt)' : 'var(--text-dim)',
+                }}
+                onMouseEnter={(e) => {
+                  if (activeTab !== tab.id) {
+                    e.currentTarget.style.color = 'var(--text-main)';
+                    e.currentTarget.style.background = 'rgba(0,0,0,0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeTab !== tab.id) {
+                    e.currentTarget.style.color = 'var(--text-dim)';
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
               >
                 <tab.icon className="w-5 h-5" />
-                <span>{tab.label}</span>
+                <span className="text-xs font-bold tracking-wider">{tab.label}</span>
               </button>
             ))}
           </nav>
         </div>
 
         {/* Content */}
-        <div className="flex-1 bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="flex-1 cyber-card p-6">
           {activeTab === 'profile' && <ProfileSettings user={user} />}
           {activeTab === 'security' && <SecuritySettings />}
           {activeTab === 'api' && <ApiKeySettings />}
@@ -78,38 +99,37 @@ function ProfileSettings({ user }: { user: unknown }) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-white">Profile</h3>
-        <p className="text-sm text-slate-400 mt-1">Update your profile information</p>
+        <h3 className="text-sm font-bold tracking-wider" style={{ color: 'var(--volt)' }}>PROFILE</h3>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>Update your profile information</p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Email
+          <label className="block text-xs font-bold tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+            EMAIL
           </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Display Name
+          <label className="block text-xs font-bold tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+            DISPLAY NAME
           </label>
           <input
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="Enter display name"
-            className="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
-        <button className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors">
-          Save Changes
+        <button className="cyber-btn">
+          <Zap className="w-4 h-4 inline mr-2" />
+          SAVE CHANGES
         </button>
       </div>
     </div>
@@ -135,52 +155,47 @@ function SecuritySettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-white">Security</h3>
-        <p className="text-sm text-slate-400 mt-1">Update your password</p>
+        <h3 className="text-sm font-bold tracking-wider" style={{ color: 'var(--data)' }}>SECURITY</h3>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>Update your password</p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Current Password
+          <label className="block text-xs font-bold tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+            CURRENT PASSWORD
           </label>
           <input
             type="password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            New Password
+          <label className="block text-xs font-bold tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+            NEW PASSWORD
           </label>
           <input
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Confirm New Password
+          <label className="block text-xs font-bold tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+            CONFIRM NEW PASSWORD
           </label>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
           />
         </div>
 
-        <button
-          onClick={handleChangePassword}
-          className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors"
-        >
-          Change Password
+        <button onClick={handleChangePassword} className="cyber-btn data">
+          <Shield className="w-4 h-4 inline mr-2" />
+          CHANGE PASSWORD
         </button>
       </div>
     </div>
@@ -219,31 +234,38 @@ function ApiKeySettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-white">API Keys</h3>
-        <p className="text-sm text-slate-400 mt-1">Manage your API access keys</p>
+        <h3 className="text-sm font-bold tracking-wider" style={{ color: 'var(--volt)' }}>API KEYS</h3>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>Manage your API access keys</p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1.5">
-            Current API Key
+          <label className="block text-xs font-bold tracking-wider mb-2" style={{ color: 'var(--text-dim)' }}>
+            CURRENT API KEY
           </label>
           <div className="flex gap-2">
-            <div className="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-slate-400 font-mono text-sm overflow-hidden text-ellipsis">
+            <div 
+              className="flex-1 px-4 py-3 font-mono text-sm overflow-hidden text-ellipsis border"
+              style={{ background: '#000', borderColor: 'var(--grid-color)', color: 'var(--volt)' }}
+            >
               {apiKey}
             </div>
             <button
               onClick={handleCopy}
-              className="px-3 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              className="cyber-btn secondary px-3"
             >
               {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-          <p className="text-sm text-amber-200">
-            <strong>Warning:</strong> Regenerating your API key will invalidate the current key.
+        <div 
+          className="p-4 border"
+          style={{ borderColor: 'var(--data)', background: 'var(--data-dim)' }}
+        >
+          <p className="text-xs" style={{ color: 'var(--data)' }}>
+            <AlertTriangle className="w-4 h-4 inline mr-2" />
+            <strong>WARNING:</strong> Regenerating your API key will invalidate the current key.
             Any applications using the old key will stop working.
           </p>
         </div>
@@ -251,10 +273,11 @@ function ApiKeySettings() {
         <button
           onClick={() => regenerateMutation.mutate()}
           disabled={regenerateMutation.isPending}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:bg-amber-600/50 text-white rounded-lg transition-colors"
+          className="cyber-btn data flex items-center gap-2"
+          style={{ opacity: regenerateMutation.isPending ? 0.5 : 1 }}
         >
           <RefreshCw className={cn('w-4 h-4', regenerateMutation.isPending && 'animate-spin')} />
-          <span>Regenerate Key</span>
+          <span>REGENERATE KEY</span>
         </button>
       </div>
     </div>
@@ -269,27 +292,27 @@ function NotificationSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-white">Notifications</h3>
-        <p className="text-sm text-slate-400 mt-1">Configure notification preferences</p>
+        <h3 className="text-sm font-bold tracking-wider" style={{ color: 'var(--data)' }}>ALERTS</h3>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>Configure notification preferences</p>
       </div>
 
       <div className="space-y-4">
         <ToggleSetting
-          label="Email Notifications"
+          label="EMAIL NOTIFICATIONS"
           description="Receive important updates via email"
           checked={emailNotifs}
           onChange={setEmailNotifs}
         />
 
         <ToggleSetting
-          label="Drift Alerts"
+          label="DRIFT ALERTS"
           description="Get notified when context drift is detected"
           checked={driftAlerts}
           onChange={setDriftAlerts}
         />
 
         <ToggleSetting
-          label="Weekly Report"
+          label="WEEKLY REPORT"
           description="Receive a weekly summary of your context health"
           checked={weeklyReport}
           onChange={setWeeklyReport}
@@ -311,23 +334,28 @@ function ToggleSetting({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg">
+    <div 
+      className="flex items-center justify-between p-4 border"
+      style={{ borderColor: 'var(--grid-color)', background: 'rgba(0,0,0,0.3)' }}
+    >
       <div>
-        <p className="font-medium text-white">{label}</p>
-        <p className="text-sm text-slate-400">{description}</p>
+        <p className="font-bold text-xs tracking-wider" style={{ color: 'var(--text-main)' }}>{label}</p>
+        <p className="text-xs normal-case" style={{ color: 'var(--text-dim)' }}>{description}</p>
       </div>
       <button
         onClick={() => onChange(!checked)}
-        className={cn(
-          'relative w-11 h-6 rounded-full transition-colors',
-          checked ? 'bg-sky-600' : 'bg-slate-600'
-        )}
+        className="relative w-11 h-6 transition-colors"
+        style={{ 
+          background: checked ? 'var(--volt)' : 'var(--grid-color)',
+          border: `1px solid ${checked ? 'var(--volt)' : 'var(--text-dim)'}`
+        }}
       >
         <span
-          className={cn(
-            'absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform',
-            checked && 'translate-x-5'
-          )}
+          className="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+          style={{ 
+            background: checked ? 'var(--void)' : 'var(--text-dim)',
+            transform: checked ? 'translateX(20px)' : 'translateX(0)'
+          }}
         />
       </button>
     </div>
@@ -367,44 +395,51 @@ function DangerZone() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-red-400">Danger Zone</h3>
-        <p className="text-sm text-slate-400 mt-1">Irreversible actions</p>
+        <h3 className="text-sm font-bold tracking-wider" style={{ color: 'var(--rage)' }}>⚠ DANGER ZONE</h3>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>Irreversible actions - proceed with caution</p>
       </div>
 
       <div className="space-y-4">
-        <div className="p-4 border border-red-500/20 rounded-lg">
+        <div 
+          className="p-4 border"
+          style={{ borderColor: 'var(--rage)', background: 'var(--rage-dim)' }}
+        >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-medium text-white">Clear All Context Data</p>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="font-bold text-xs tracking-wider" style={{ color: 'var(--text-main)' }}>CLEAR ALL CONTEXT DATA</p>
+              <p className="text-xs mt-1 normal-case" style={{ color: 'var(--text-dim)' }}>
                 Permanently delete all stored context data for your account
               </p>
             </div>
             <button
               onClick={handleClearData}
               disabled={clearMutation.isPending}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:bg-red-600/50 text-white rounded-lg transition-colors flex-shrink-0"
+              className="cyber-btn danger flex items-center gap-2 flex-shrink-0"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Clear Data</span>
+              <span>CLEAR DATA</span>
             </button>
           </div>
         </div>
 
-        <div className="p-4 border border-red-500/20 rounded-lg">
+        <div 
+          className="p-4 border"
+          style={{ borderColor: 'var(--rage)' }}
+        >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-medium text-white">Delete Account</p>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="font-bold text-xs tracking-wider" style={{ color: 'var(--text-main)' }}>DELETE ACCOUNT</p>
+              <p className="text-xs mt-1 normal-case" style={{ color: 'var(--text-dim)' }}>
                 Permanently delete your account and all associated data
               </p>
             </div>
             <button
               onClick={handleDeleteAccount}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-red-500 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
+              className="cyber-btn danger flex items-center gap-2 flex-shrink-0"
+              style={{ background: 'transparent' }}
             >
               <Trash2 className="w-4 h-4" />
-              <span>Delete Account</span>
+              <span>DELETE</span>
             </button>
           </div>
         </div>

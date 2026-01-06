@@ -7,10 +7,12 @@ import {
   RefreshCw,
   Download,
   ArrowRight,
+  Shield,
+  Activity,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '@/lib/api';
-import { cn, getDriftStatusColor, formatRelativeTime } from '@/lib/utils';
+import { cn, formatRelativeTime } from '@/lib/utils';
 import type { DriftReport, DriftItem } from '@/types';
 
 // Mock data
@@ -103,29 +105,35 @@ export default function DriftReportPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Drift Report</h1>
-          <p className="text-slate-400 mt-1">
-            Context health analysis and recommendations
+          <div className="flex items-center gap-3">
+            <Shield className="w-6 h-6" style={{ color: 'var(--data)' }} />
+            <h1 className="text-xl font-bold tracking-wider" style={{ color: 'var(--data)' }}>
+              DRIFT REPORT
+            </h1>
+          </div>
+          <p className="mt-1 text-xs tracking-widest" style={{ color: 'var(--text-dim)' }}>
+            CONTEXT HEALTH ANALYSIS // {data.items.length} ISSUES DETECTED
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => refetch()}
             disabled={isRefetching}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-lg transition-colors"
+            className="cyber-btn secondary flex items-center gap-2"
+            style={{ opacity: isRefetching ? 0.5 : 1 }}
           >
             <RefreshCw className={cn('w-4 h-4', isRefetching && 'animate-spin')} />
-            <span>Refresh</span>
+            <span>REFRESH</span>
           </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors">
+          <button className="cyber-btn flex items-center gap-2">
             <Download className="w-4 h-4" />
-            <span>Export</span>
+            <span>EXPORT</span>
           </button>
         </div>
       </div>
 
       {/* Health overview */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+      <div className="cyber-card p-6">
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
           {/* Health score */}
           <div className="flex items-center gap-4">
@@ -135,29 +143,28 @@ export default function DriftReportPage() {
                   cx="48"
                   cy="48"
                   r="40"
-                  stroke="currentColor"
+                  stroke="var(--grid-color)"
                   strokeWidth="8"
                   fill="none"
-                  className="text-slate-700"
                 />
                 <circle
                   cx="48"
                   cy="48"
                   r="40"
-                  stroke="currentColor"
+                  stroke="var(--volt)"
                   strokeWidth="8"
                   fill="none"
                   strokeDasharray={`${parseFloat(healthPercent) * 2.51} 251`}
-                  className="text-green-500"
+                  style={{ filter: 'drop-shadow(0 0 8px var(--volt-dim))' }}
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">{healthPercent}%</span>
+                <span className="text-2xl font-bold" style={{ color: 'var(--volt)' }}>{healthPercent}%</span>
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white">Overall Health</h3>
-              <p className="text-sm text-slate-400">
+              <h3 className="text-sm font-bold tracking-wider" style={{ color: 'var(--volt)' }}>SYSTEM HEALTH</h3>
+              <p className="text-xs" style={{ color: 'var(--text-dim)' }}>
                 {data.healthy_count} of {data.total_contexts} contexts healthy
               </p>
             </div>
@@ -167,27 +174,27 @@ export default function DriftReportPage() {
           <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatusCard
               icon={CheckCircle}
-              label="Healthy"
+              label="HEALTHY"
               count={data.healthy_count}
-              color="green"
+              color="volt"
             />
             <StatusCard
               icon={AlertTriangle}
-              label="Drifting"
+              label="DRIFTING"
               count={data.drifting_count}
-              color="yellow"
+              color="data"
             />
             <StatusCard
               icon={XCircle}
-              label="Conflicting"
+              label="CONFLICT"
               count={data.conflicting_count}
-              color="red"
+              color="rage"
             />
             <StatusCard
               icon={Clock}
-              label="Stale"
+              label="STALE"
               count={data.stale_count}
-              color="gray"
+              color="dim"
             />
           </div>
         </div>
@@ -195,16 +202,19 @@ export default function DriftReportPage() {
 
       {/* Recommendations */}
       {data.recommendations.length > 0 && (
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5">
-          <h3 className="font-semibold text-amber-400 mb-3 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
-            Recommendations
+        <div 
+          className="p-5 border"
+          style={{ borderColor: 'var(--data)', background: 'var(--data-dim)' }}
+        >
+          <h3 className="font-bold text-xs tracking-wider mb-3 flex items-center gap-2" style={{ color: 'var(--data)' }}>
+            <Activity className="w-5 h-5" />
+            RECOMMENDATIONS
           </h3>
           <ul className="space-y-2">
             {data.recommendations.map((rec, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm text-amber-200">
-                <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span>{rec}</span>
+              <li key={index} className="flex items-start gap-2 text-xs" style={{ color: 'var(--text-main)' }}>
+                <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--data)' }} />
+                <span className="normal-case">{rec}</span>
               </li>
             ))}
           </ul>
@@ -212,17 +222,23 @@ export default function DriftReportPage() {
       )}
 
       {/* Issues list */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-700">
-          <h3 className="font-semibold text-white">Contexts Needing Attention</h3>
+      <div className="cyber-card overflow-hidden">
+        <div 
+          className="px-5 py-4 border-b flex items-center gap-2"
+          style={{ borderColor: 'var(--grid-color)' }}
+        >
+          <AlertTriangle className="w-4 h-4" style={{ color: 'var(--rage)' }} />
+          <h3 className="font-bold text-xs tracking-wider" style={{ color: 'var(--rage)' }}>
+            CONTEXTS NEEDING ATTENTION
+          </h3>
         </div>
-        <div className="divide-y divide-slate-700">
+        <div>
           {data.items.map((item) => (
             <DriftItemRow key={item.context_id} item={item} />
           ))}
           {data.items.length === 0 && (
-            <div className="px-5 py-8 text-center text-slate-500">
-              No issues found. All contexts are healthy!
+            <div className="px-5 py-8 text-center text-xs" style={{ color: 'var(--text-dim)' }}>
+              NO ISSUES FOUND. ALL CONTEXTS ARE HEALTHY!
             </div>
           )}
         </div>
@@ -230,7 +246,10 @@ export default function DriftReportPage() {
 
       {isLoading && (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full" />
+          <div 
+            className="animate-spin w-8 h-8 border-2 border-t-transparent"
+            style={{ borderColor: 'var(--data)', borderTopColor: 'transparent' }}
+          />
         </div>
       )}
     </div>
@@ -241,26 +260,33 @@ interface StatusCardProps {
   icon: React.ElementType;
   label: string;
   count: number;
-  color: 'green' | 'yellow' | 'red' | 'gray';
+  color: 'volt' | 'data' | 'rage' | 'dim';
 }
 
 function StatusCard({ icon: Icon, label, count, color }: StatusCardProps) {
-  const colorClasses = {
-    green: 'text-green-400 bg-green-500/10',
-    yellow: 'text-yellow-400 bg-yellow-500/10',
-    red: 'text-red-400 bg-red-500/10',
-    gray: 'text-gray-400 bg-gray-500/10',
+  const colorStyles = {
+    volt: { border: 'var(--volt)', bg: 'var(--volt-dim)', text: 'var(--volt)' },
+    data: { border: 'var(--data)', bg: 'var(--data-dim)', text: 'var(--data)' },
+    rage: { border: 'var(--rage)', bg: 'var(--rage-dim)', text: 'var(--rage)' },
+    dim: { border: 'var(--text-dim)', bg: 'rgba(100,100,100,0.2)', text: 'var(--text-dim)' },
   };
+  const style = colorStyles[color];
 
   return (
-    <div className="p-4 bg-slate-900/50 rounded-lg">
+    <div 
+      className="p-4 border"
+      style={{ borderColor: 'var(--grid-color)', background: 'rgba(0,0,0,0.3)' }}
+    >
       <div className="flex items-center gap-2 mb-1">
-        <div className={cn('p-1.5 rounded', colorClasses[color])}>
-          <Icon className="w-4 h-4" />
+        <div 
+          className="p-1.5"
+          style={{ background: style.bg, border: `1px solid ${style.border}` }}
+        >
+          <Icon className="w-4 h-4" style={{ color: style.text }} />
         </div>
-        <span className="text-sm text-slate-400">{label}</span>
+        <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>{label}</span>
       </div>
-      <span className="text-2xl font-bold text-white">{count}</span>
+      <span className="text-2xl font-bold" style={{ color: style.text }}>{count}</span>
     </div>
   );
 }
@@ -270,52 +296,64 @@ interface DriftItemRowProps {
 }
 
 function DriftItemRow({ item }: DriftItemRowProps) {
-  const statusIcons = {
-    stable: CheckCircle,
-    drifting: AlertTriangle,
-    conflicting: XCircle,
-    stale: Clock,
+  const statusConfig = {
+    stable: { icon: CheckCircle, color: 'var(--volt)' },
+    drifting: { icon: AlertTriangle, color: 'var(--data)' },
+    conflicting: { icon: XCircle, color: 'var(--rage)' },
+    stale: { icon: Clock, color: 'var(--text-dim)' },
   };
-  const StatusIcon = statusIcons[item.drift_status];
+  const config = statusConfig[item.drift_status] || statusConfig.stale;
+  const StatusIcon = config.icon;
 
   return (
-    <div className="px-5 py-4 hover:bg-slate-800/50 transition-colors">
+    <div 
+      className="px-5 py-4 border-b transition-colors"
+      style={{ borderColor: 'var(--grid-color)' }}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(252, 238, 10, 0.05)'}
+      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className={cn('p-2 rounded-lg mt-0.5', getDriftStatusColor(item.drift_status))}>
-            <StatusIcon className="w-4 h-4" />
+          <div 
+            className="p-2 mt-0.5"
+            style={{ background: `${config.color}20`, border: `1px solid ${config.color}` }}
+          >
+            <StatusIcon className="w-4 h-4" style={{ color: config.color }} />
           </div>
           <div>
             <Link
               to={`/contexts/${item.context_id}`}
-              className="font-medium text-white hover:text-sky-400 transition-colors"
+              className="font-bold text-xs tracking-wider transition-colors"
+              style={{ color: 'var(--text-main)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--volt)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-main)'}
             >
               {item.key}
             </Link>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-xs text-slate-500 capitalize">{item.context_type}</span>
-              <span className="text-xs text-slate-600">•</span>
-              <span className="text-xs text-slate-500">{item.days_since_update}d since update</span>
+              <span className="text-xs" style={{ color: 'var(--text-dim)' }}>{item.context_type}</span>
+              <span className="text-xs" style={{ color: 'var(--grid-color)' }}>•</span>
+              <span className="text-xs" style={{ color: 'var(--text-dim)' }}>{item.days_since_update}d since update</span>
               {item.last_verified && (
                 <>
-                  <span className="text-xs text-slate-600">•</span>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs" style={{ color: 'var(--grid-color)' }}>•</span>
+                  <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
                     Verified {formatRelativeTime(item.last_verified)}
                   </span>
                 </>
               )}
             </div>
-            <p className="text-sm text-slate-400 mt-2">{item.recommendation}</p>
+            <p className="text-xs mt-2 normal-case" style={{ color: 'var(--text-dim)' }}>{item.recommendation}</p>
           </div>
         </div>
         <div className="text-right flex-shrink-0">
-          <span className={cn(
-            'text-sm font-medium',
-            item.confidence >= 0.6 ? 'text-yellow-400' : 'text-red-400'
-          )}>
+          <span 
+            className="text-sm font-bold"
+            style={{ color: item.confidence >= 0.6 ? 'var(--data)' : 'var(--rage)' }}
+          >
             {(item.confidence * 100).toFixed(0)}%
           </span>
-          <p className="text-xs text-slate-500">confidence</p>
+          <p className="text-xs" style={{ color: 'var(--text-dim)' }}>confidence</p>
         </div>
       </div>
     </div>

@@ -2417,10 +2417,7 @@ let _lastDOMScan = 0;
     updateActivityTimestamp();
     
     const selection = window.getSelection();
-    let selectedText = selection?.toString()?.trim();
-    
-    // CRITICAL: Filter out any RAL badge content from selections
-    selectedText = filterRALContent(selectedText);
+    const selectedText = selection?.toString()?.trim();
     
     if (selectedText && selectedText.length > 0) {
       // v4.0: Track for frustration detection (even if same selection)
@@ -2549,47 +2546,9 @@ let _lastDOMScan = 0;
     return metadata;
   }
   
-  /**
-   * CRITICAL: Filter out RAL badge content from captured text
-   * Prevents badge text from leaking into context injections
-   */
-  function filterRALContent(text) {
-    if (!text) return text;
-    
-    // Remove RAL badge text patterns
-    let filtered = text
-      // Badge text patterns
-      .replace(/\[◎\]CONTEXT_FUSED/gi, '')
-      .replace(/\[◈\]REALITY_PATCHED/gi, '')
-      .replace(/\[!\]PRIORITY_OVERRIDE/gi, '')
-      .replace(/\[R\]ANCHORED/gi, '')
-      // Badge prefix patterns alone
-      .replace(/\[◎\]/g, '')
-      .replace(/\[◈\]/g, '')
-      .replace(/\[!\]/g, '')
-      .replace(/\[R\]/g, '')
-      // Badge text alone
-      .replace(/CONTEXT_FUSED/g, '')
-      .replace(/REALITY_PATCHED/g, '')
-      .replace(/PRIORITY_OVERRIDE/g, '')
-      .replace(/ANCHORED/g, '')
-      // RAL XML context (should never be copied but just in case)
-      .replace(/<reality_context[\s\S]*?<\/reality_context>/gi, '')
-      .replace(/&lt;reality_context[\s\S]*?&lt;\/reality_context&gt;/gi, '')
-      .replace(/<!-- RAL -->/gi, '')
-      // Clean up multiple spaces/newlines left behind
-      .replace(/\s{3,}/g, ' ')
-      .trim();
-    
-    return filtered;
-  }
-  
   function handleCopy(event) {
     const selection = window.getSelection();
-    let copiedText = selection?.toString()?.trim();
-    
-    // CRITICAL: Filter out any RAL badge content
-    copiedText = filterRALContent(copiedText);
+    const copiedText = selection?.toString()?.trim();
     
     if (copiedText && copiedText.length > 0) {
       // Update activity timestamp

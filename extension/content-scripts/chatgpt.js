@@ -43,6 +43,7 @@
     injectionTimeout: null,
     injectionCount: 0,
     lastContextData: null,
+    skipNextClick: false, // Flag to prevent infinite loop when re-clicking send button
   };
 
   // Behavioral color palette for the Orb
@@ -249,7 +250,6 @@
                xmlContent.includes('FRUSTRATED') ||
                xmlContent.includes('frustration_level="HIGH"') ||
                xmlContent.includes('EMERGENCY')) {
-      badgeIcon = '🔥';
       badgeText = 'Priority Anchored';
       badgeClass = 'ral-badge-priority';
     }
@@ -787,6 +787,7 @@
     const triggerSend = () => {
       const btn = findSendButton();
       if (btn) {
+        State.skipNextClick = true; // Prevent handleButtonClick from re-intercepting
         btn.click();
       } else {
         const enterEvent = new KeyboardEvent('keydown', {
@@ -816,7 +817,12 @@
   }
 
   async function handleButtonClick(event) {
+    // Skip if we're already processing or if this is a programmatic re-click
     if (State.processing) return;
+    if (State.skipNextClick) {
+      State.skipNextClick = false;
+      return; // Let the native click through
+    }
 
     const textarea = findTextarea();
     if (!textarea) return;
@@ -824,6 +830,12 @@
     const value = getInputValue(textarea);
     if (value.trim().length < 3) return;
     if (value.includes('<reality_context') || value.includes('[Context:')) return;
+
+    // Check if extension context is still valid before processing
+    if (!State.extensionValid || !chrome.runtime?.id) {
+      console.log('RAL v4.6: Extension context invalid, allowing native send');
+      return; // Let the native click through
+    }
 
     State.processing = true;
 
@@ -842,7 +854,12 @@
     State.processing = false;
 
     if (!result || result === 'skip') {
-      setTimeout(() => findSendButton()?.click(), 10);
+      // Set flag to skip next click and allow native behavior
+      State.skipNextClick = true;
+      setTimeout(() => {
+        const btn = findSendButton();
+        if (btn) btn.click();
+      }, 10);
     }
 
     resetEditMode();

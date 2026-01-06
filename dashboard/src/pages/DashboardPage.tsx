@@ -7,10 +7,14 @@ import {
   TrendingUp,
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Zap,
+  Activity,
+  Shield,
+  Layers
 } from 'lucide-react';
 import api from '@/lib/api';
-import { cn, getConfidenceColor, formatRelativeTime } from '@/lib/utils';
+import { formatRelativeTime } from '@/lib/utils';
 import type { DashboardSummary, Context } from '@/types';
 
 // Mock data for demo
@@ -130,9 +134,22 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="text-slate-400 mt-1">Overview of your context intelligence</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-3">
+            <Zap className="w-6 h-6 text-volt" style={{ color: 'var(--volt)' }} />
+            <h1 className="text-xl font-bold tracking-wider" style={{ color: 'var(--volt)' }}>
+              COMMAND CENTER
+            </h1>
+          </div>
+          <p className="text-dim mt-1 text-xs tracking-widest" style={{ color: 'var(--text-dim)' }}>
+            CONTEXT INTELLIGENCE OVERVIEW // SYSTEM STATUS: NOMINAL
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="status-dot online" />
+          <span className="text-xs" style={{ color: 'var(--volt)' }}>LIVE</span>
+        </div>
       </div>
 
       {/* Stats grid */}
@@ -141,60 +158,63 @@ export default function DashboardPage() {
           title="Total Contexts"
           value={stats.total_contexts}
           icon={Database}
-          color="sky"
+          color="volt"
         />
         <StatCard
           title="Avg Confidence"
           value={`${(stats.avg_confidence * 100).toFixed(1)}%`}
           icon={TrendingUp}
-          color="green"
+          color="data"
         />
         <StatCard
           title="Recent Updates"
           value={stats.recent_updates}
-          icon={Clock}
-          color="amber"
+          icon={Activity}
+          color="volt"
         />
         <StatCard
           title="Needs Attention"
           value={stats.low_confidence_count + stats.stale_count}
           icon={AlertTriangle}
-          color="red"
+          color="rage"
         />
       </div>
 
       {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Context types breakdown */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <h3 className="font-semibold text-white mb-4">Context Types</h3>
+        <div className="cyber-card p-5">
+          <h3 className="font-bold mb-4 text-xs tracking-widest flex items-center gap-2" style={{ color: 'var(--volt)' }}>
+            <Target className="w-4 h-4" />
+            CONTEXT TYPES
+          </h3>
           <div className="space-y-3">
             <ContextTypeBar
-              type="Temporal"
+              type="TEMPORAL"
               count={stats.by_type.temporal}
               total={stats.total_contexts}
               icon={Clock}
             />
             <ContextTypeBar
-              type="Spatial"
+              type="SPATIAL"
               count={stats.by_type.spatial}
               total={stats.total_contexts}
               icon={MapPin}
             />
             <ContextTypeBar
-              type="Situational"
+              type="SITUATIONAL"
               count={stats.by_type.situational}
               total={stats.total_contexts}
               icon={Target}
             />
             <ContextTypeBar
-              type="Preference"
+              type="PREFERENCE"
               count={stats.by_type.preference}
               total={stats.total_contexts}
               icon={CheckCircle}
             />
             <ContextTypeBar
-              type="Identity"
+              type="IDENTITY"
               count={stats.by_type.identity}
               total={stats.total_contexts}
               icon={Database}
@@ -203,65 +223,81 @@ export default function DashboardPage() {
         </div>
 
         {/* Drift status */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <h3 className="font-semibold text-white mb-4">Context Health</h3>
+        <div className="cyber-card p-5">
+          <h3 className="font-bold mb-4 text-xs tracking-widest flex items-center gap-2" style={{ color: 'var(--data)' }}>
+            <Shield className="w-4 h-4" />
+            CONTEXT HEALTH
+          </h3>
           <div className="space-y-3">
             <DriftStatusRow
-              status="Stable"
+              status="STABLE"
               count={stats.drift_status.stable}
               total={stats.total_contexts}
-              color="green"
+              color="volt"
             />
             <DriftStatusRow
-              status="Drifting"
+              status="DRIFTING"
               count={stats.drift_status.drifting}
               total={stats.total_contexts}
-              color="yellow"
+              color="data"
             />
             <DriftStatusRow
-              status="Conflicting"
+              status="CONFLICTING"
               count={stats.drift_status.conflicting}
               total={stats.total_contexts}
-              color="red"
+              color="rage"
             />
             <DriftStatusRow
-              status="Stale"
+              status="STALE"
               count={stats.drift_status.stale}
               total={stats.total_contexts}
-              color="gray"
+              color="dim"
             />
           </div>
         </div>
 
         {/* Memory tiers */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <h3 className="font-semibold text-white mb-4">Memory Tiers</h3>
+        <div className="cyber-card p-5">
+          <h3 className="font-bold mb-4 text-xs tracking-widest flex items-center gap-2" style={{ color: 'var(--volt)' }}>
+            <Layers className="w-4 h-4" />
+            MEMORY TIERS
+          </h3>
           <div className="space-y-4">
             <TierCard
-              tier="Long-term"
+              tier="LONG-TERM"
               count={stats.by_tier.long_term}
               description="Persistent context"
+              color="volt"
             />
             <TierCard
-              tier="Short-term"
+              tier="SHORT-TERM"
               count={stats.by_tier.short_term}
               description="Session context"
+              color="data"
             />
             <TierCard
-              tier="Ephemeral"
+              tier="EPHEMERAL"
               count={stats.by_tier.ephemeral}
               description="Temporary context"
+              color="dim"
             />
           </div>
         </div>
       </div>
 
       {/* Recent contexts */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+      <div className="cyber-card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-white">Recent Context Updates</h3>
-          <a href="/contexts" className="text-sm text-sky-400 hover:text-sky-300">
-            View all →
+          <h3 className="font-bold text-xs tracking-widest flex items-center gap-2" style={{ color: 'var(--volt)' }}>
+            <Activity className="w-4 h-4" />
+            RECENT CONTEXT UPDATES
+          </h3>
+          <a 
+            href="/contexts" 
+            className="text-xs font-bold tracking-wider hover:underline transition-colors"
+            style={{ color: 'var(--data)' }}
+          >
+            VIEW ALL →
           </a>
         </div>
         <div className="space-y-3">
@@ -272,8 +308,14 @@ export default function DashboardPage() {
       </div>
 
       {isLoading && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center">
-          <div className="animate-spin w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full" />
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-3">
+            <div 
+              className="animate-spin w-8 h-8 border-2 border-t-transparent"
+              style={{ borderColor: 'var(--volt)', borderTopColor: 'transparent' }}
+            />
+            <span className="text-xs tracking-widest" style={{ color: 'var(--volt)' }}>LOADING...</span>
+          </div>
         </div>
       )}
     </div>
@@ -285,26 +327,32 @@ interface StatCardProps {
   title: string;
   value: string | number;
   icon: React.ElementType;
-  color: 'sky' | 'green' | 'amber' | 'red';
+  color: 'volt' | 'data' | 'rage';
 }
 
 function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
-  const colorClasses = {
-    sky: 'bg-sky-500/10 text-sky-400',
-    green: 'bg-green-500/10 text-green-400',
-    amber: 'bg-amber-500/10 text-amber-400',
-    red: 'bg-red-500/10 text-red-400',
+  const colorStyles = {
+    volt: { border: 'var(--volt)', bg: 'var(--volt-dim)', text: 'var(--volt)' },
+    data: { border: 'var(--data)', bg: 'var(--data-dim)', text: 'var(--data)' },
+    rage: { border: 'var(--rage)', bg: 'var(--rage-dim)', text: 'var(--rage)' },
   };
+  const style = colorStyles[color];
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+    <div 
+      className="cyber-card p-5"
+      style={{ borderColor: style.border }}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-slate-400">{title}</p>
-          <p className="text-2xl font-bold text-white mt-1">{value}</p>
+          <p className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>{title}</p>
+          <p className="text-2xl font-bold mt-1" style={{ color: style.text }}>{value}</p>
         </div>
-        <div className={cn('p-2 rounded-lg', colorClasses[color])}>
-          <Icon className="w-5 h-5" />
+        <div 
+          className="p-2"
+          style={{ background: style.bg, border: `1px solid ${style.border}` }}
+        >
+          <Icon className="w-5 h-5" style={{ color: style.text }} />
         </div>
       </div>
     </div>
@@ -325,14 +373,14 @@ function ContextTypeBar({ type, count, total, icon: Icon }: ContextTypeBarProps)
     <div>
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-slate-400" />
-          <span className="text-sm text-slate-300">{type}</span>
+          <Icon className="w-4 h-4" style={{ color: 'var(--text-dim)' }} />
+          <span className="text-xs tracking-wider" style={{ color: 'var(--text-main)' }}>{type}</span>
         </div>
-        <span className="text-sm text-slate-400">{count}</span>
+        <span className="text-xs font-bold" style={{ color: 'var(--volt)' }}>{count}</span>
       </div>
-      <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+      <div className="progress-bar">
         <div
-          className="h-full bg-sky-500 rounded-full transition-all"
+          className="progress-bar-fill"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -344,24 +392,27 @@ interface DriftStatusRowProps {
   status: string;
   count: number;
   total: number;
-  color: 'green' | 'yellow' | 'red' | 'gray';
+  color: 'volt' | 'data' | 'rage' | 'dim';
 }
 
 function DriftStatusRow({ status, count, total, color }: DriftStatusRowProps) {
   const percentage = total > 0 ? (count / total) * 100 : 0;
-  const colorClasses = {
-    green: 'bg-green-500',
-    yellow: 'bg-yellow-500',
-    red: 'bg-red-500',
-    gray: 'bg-gray-500',
+  const colorStyles = {
+    volt: 'var(--volt)',
+    data: 'var(--data)',
+    rage: 'var(--rage)',
+    dim: 'var(--text-dim)',
   };
 
   return (
     <div className="flex items-center gap-3">
-      <div className={cn('w-3 h-3 rounded-full', colorClasses[color])} />
-      <span className="text-sm text-slate-300 flex-1">{status}</span>
-      <span className="text-sm text-slate-400">{count}</span>
-      <span className="text-xs text-slate-500">({percentage.toFixed(1)}%)</span>
+      <div 
+        className="w-2 h-2"
+        style={{ background: colorStyles[color], boxShadow: `0 0 8px ${colorStyles[color]}` }}
+      />
+      <span className="text-xs tracking-wider flex-1" style={{ color: 'var(--text-main)' }}>{status}</span>
+      <span className="text-xs font-bold" style={{ color: colorStyles[color] }}>{count}</span>
+      <span className="text-xs" style={{ color: 'var(--text-dim)' }}>({percentage.toFixed(1)}%)</span>
     </div>
   );
 }
@@ -370,16 +421,27 @@ interface TierCardProps {
   tier: string;
   count: number;
   description: string;
+  color: 'volt' | 'data' | 'dim';
 }
 
-function TierCard({ tier, count, description }: TierCardProps) {
+function TierCard({ tier, count, description, color }: TierCardProps) {
+  const colorStyles = {
+    volt: { border: 'var(--volt)', text: 'var(--volt)' },
+    data: { border: 'var(--data)', text: 'var(--data)' },
+    dim: { border: 'var(--text-dim)', text: 'var(--text-dim)' },
+  };
+  const style = colorStyles[color];
+
   return (
-    <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg">
+    <div 
+      className="flex items-center justify-between p-3 border"
+      style={{ borderColor: 'var(--grid-color)', background: 'rgba(0,0,0,0.3)' }}
+    >
       <div>
-        <p className="font-medium text-slate-200">{tier}</p>
-        <p className="text-xs text-slate-500">{description}</p>
+        <p className="font-bold text-xs tracking-wider" style={{ color: style.text }}>{tier}</p>
+        <p className="text-xs normal-case" style={{ color: 'var(--text-dim)' }}>{description}</p>
       </div>
-      <span className="text-xl font-bold text-white">{count}</span>
+      <span className="text-xl font-bold" style={{ color: style.text }}>{count}</span>
     </div>
   );
 }
@@ -389,41 +451,43 @@ interface ContextRowProps {
 }
 
 function ContextRow({ context }: ContextRowProps) {
-  const statusIcons = {
-    stable: CheckCircle,
-    drifting: AlertTriangle,
-    conflicting: XCircle,
-    stale: Clock,
+  const statusConfig = {
+    stable: { icon: CheckCircle, color: 'var(--volt)' },
+    drifting: { icon: AlertTriangle, color: 'var(--data)' },
+    conflicting: { icon: XCircle, color: 'var(--rage)' },
+    stale: { icon: Clock, color: 'var(--text-dim)' },
   };
-  const StatusIcon = statusIcons[context.drift_status] || Database;
+  const config = statusConfig[context.drift_status] || { icon: Database, color: 'var(--text-dim)' };
+  const StatusIcon = config.icon;
 
   return (
-    <div className="flex items-center gap-4 p-3 bg-slate-900/50 rounded-lg">
-      <div className="p-2 bg-slate-800 rounded-lg">
-        <StatusIcon className={cn('w-4 h-4', getDriftStatusIconColor(context.drift_status))} />
+    <div 
+      className="flex items-center gap-4 p-3 border transition-all hover:border-volt-dim"
+      style={{ borderColor: 'var(--grid-color)', background: 'rgba(0,0,0,0.3)' }}
+    >
+      <div 
+        className="p-2"
+        style={{ border: `1px solid ${config.color}`, background: `${config.color}20` }}
+      >
+        <StatusIcon className="w-4 h-4" style={{ color: config.color }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-slate-200 truncate">{context.key}</p>
-        <p className="text-sm text-slate-500 truncate">
+        <p className="font-bold text-xs tracking-wider truncate" style={{ color: 'var(--text-main)' }}>
+          {context.key}
+        </p>
+        <p className="text-xs truncate normal-case" style={{ color: 'var(--text-dim)' }}>
           {typeof context.value === 'string' ? context.value : JSON.stringify(context.value)}
         </p>
       </div>
       <div className="text-right">
-        <p className={cn('text-sm font-medium', getConfidenceColor(context.confidence))}>
+        <p 
+          className="text-sm font-bold"
+          style={{ color: context.confidence >= 0.8 ? 'var(--volt)' : context.confidence >= 0.6 ? 'var(--data)' : 'var(--rage)' }}
+        >
           {(context.confidence * 100).toFixed(0)}%
         </p>
-        <p className="text-xs text-slate-500">{formatRelativeTime(context.updated_at)}</p>
+        <p className="text-xs" style={{ color: 'var(--text-dim)' }}>{formatRelativeTime(context.updated_at)}</p>
       </div>
     </div>
   );
-}
-
-function getDriftStatusIconColor(status: string): string {
-  switch (status) {
-    case 'stable': return 'text-green-400';
-    case 'drifting': return 'text-yellow-400';
-    case 'conflicting': return 'text-red-400';
-    case 'stale': return 'text-gray-400';
-    default: return 'text-slate-400';
-  }
 }

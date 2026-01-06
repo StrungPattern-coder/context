@@ -97,7 +97,7 @@ Services will be available at:
 
 ---
 
-## 🔌 Hybrid Architecture
+## Hybrid Architecture
 
 RAL supports three operating modes:
 
@@ -128,7 +128,7 @@ RAL supports three operating modes:
 
 ---
 
-## 📦 SDKs
+## SDKs
 
 ### Python SDK
 
@@ -164,7 +164,7 @@ const response = await ral.augment('What should I focus on?', { provider: 'opena
 
 ---
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 ral/
@@ -232,7 +232,7 @@ ral/
 
 ---
 
-## 📡 API Examples
+## API Examples
 
 ### Anchor Context
 
@@ -265,7 +265,7 @@ curl -X POST http://localhost:8000/v1/prompt/compose \
 
 ---
 
-## 🔐 Security
+## Security
 
 - JWT-based authentication
 - Tenant isolation
@@ -275,7 +275,7 @@ curl -X POST http://localhost:8000/v1/prompt/compose \
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 - [Philosophy & Design](docs/PHILOSOPHY.md)
 - [System Architecture](docs/ARCHITECTURE.md)
@@ -285,7 +285,7 @@ curl -X POST http://localhost:8000/v1/prompt/compose \
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -301,7 +301,7 @@ pytest tests/engines/test_temporal.py
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -313,6 +313,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Built with the belief that AI should understand human reality, not require humans to explain it repeatedly.

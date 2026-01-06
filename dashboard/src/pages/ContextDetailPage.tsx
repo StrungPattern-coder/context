@@ -12,13 +12,13 @@ import {
   Save,
   X,
   History,
+  Database,
+  Activity,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/lib/api';
 import {
   cn,
-  getConfidenceColor,
-  getDriftStatusColor,
   getContextTypeIcon,
   formatDateTime,
   formatValue,
@@ -181,7 +181,10 @@ export default function ContextDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full" />
+        <div 
+          className="animate-spin w-8 h-8 border-2 border-t-transparent"
+          style={{ borderColor: 'var(--volt)', borderTopColor: 'transparent' }}
+        />
       </div>
     );
   }
@@ -189,13 +192,14 @@ export default function ContextDetailPage() {
   const ctx = context || mockContext;
   const history = versions || mockVersions;
 
-  const statusIcons = {
-    stable: CheckCircle,
-    drifting: AlertTriangle,
-    conflicting: XCircle,
-    stale: Clock,
+  const statusConfig = {
+    stable: { icon: CheckCircle, color: 'var(--volt)' },
+    drifting: { icon: AlertTriangle, color: 'var(--data)' },
+    conflicting: { icon: XCircle, color: 'var(--rage)' },
+    stale: { icon: Clock, color: 'var(--text-dim)' },
   };
-  const StatusIcon = statusIcons[ctx.drift_status];
+  const config = statusConfig[ctx.drift_status] || statusConfig.stable;
+  const StatusIcon = config.icon;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -204,40 +208,39 @@ export default function ContextDetailPage() {
         <div className="flex items-center gap-4">
           <Link
             to="/contexts"
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 transition-colors"
+            style={{ color: 'var(--text-dim)' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--volt)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-dim)'}
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
             <div className="flex items-center gap-3">
               <span className="text-2xl">{getContextTypeIcon(ctx.context_type)}</span>
-              <h1 className="text-2xl font-bold text-white">{ctx.key}</h1>
+              <h1 className="text-xl font-bold tracking-wider" style={{ color: 'var(--volt)' }}>{ctx.key}</h1>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-slate-400 capitalize">{ctx.context_type}</span>
-              <span className="text-slate-600">•</span>
-              <span className="text-sm text-slate-400">{ctx.memory_tier.replace('_', ' ')}</span>
-              <span className="text-slate-600">•</span>
-              <span className="text-sm text-slate-400">v{ctx.version}</span>
+              <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>{ctx.context_type}</span>
+              <span style={{ color: 'var(--grid-color)' }}>•</span>
+              <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>{ctx.memory_tier.replace('_', ' ')}</span>
+              <span style={{ color: 'var(--grid-color)' }}>•</span>
+              <span className="text-xs tracking-wider" style={{ color: 'var(--data)' }}>v{ctx.version}</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className={cn(
-              'inline-flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
-              showHistory
-                ? 'bg-sky-600 text-white'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            )}
+            className={cn('cyber-btn flex items-center gap-2', showHistory ? '' : 'secondary')}
           >
             <History className="w-4 h-4" />
-            <span>History</span>
+            <span>HISTORY</span>
           </button>
           <button
             onClick={handleDelete}
-            className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors"
+            className="cyber-btn danger p-2"
+            style={{ background: 'transparent' }}
           >
             <Trash2 className="w-5 h-5" />
           </button>
@@ -248,16 +251,22 @@ export default function ContextDetailPage() {
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Value card */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+          <div className="cyber-card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-white">Value</h3>
+              <h3 className="font-bold text-xs tracking-wider flex items-center gap-2" style={{ color: 'var(--volt)' }}>
+                <Database className="w-4 h-4" />
+                VALUE
+              </h3>
               {!isEditing && (
                 <button
                   onClick={handleEdit}
-                  className="inline-flex items-center gap-1.5 text-sm text-sky-400 hover:text-sky-300"
+                  className="flex items-center gap-1.5 text-xs tracking-wider transition-colors"
+                  style={{ color: 'var(--data)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--volt)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--data)'}
                 >
                   <Edit2 className="w-4 h-4" />
-                  <span>Edit</span>
+                  <span>EDIT</span>
                 </button>
               )}
             </div>
@@ -267,39 +276,51 @@ export default function ContextDetailPage() {
                 <textarea
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="w-full h-32 px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg text-white font-mono text-sm focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                  className="w-full h-32"
+                  style={{ fontFamily: 'JetBrains Mono, monospace' }}
                 />
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleSave}
                     disabled={updateMutation.isPending}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-500 disabled:bg-sky-600/50 text-white rounded-lg transition-colors"
+                    className="cyber-btn flex items-center gap-2"
+                    style={{ opacity: updateMutation.isPending ? 0.5 : 1 }}
                   >
                     <Save className="w-4 h-4" />
-                    <span>Save</span>
+                    <span>SAVE</span>
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                    className="cyber-btn secondary flex items-center gap-2"
                   >
                     <X className="w-4 h-4" />
-                    <span>Cancel</span>
+                    <span>CANCEL</span>
                   </button>
                 </div>
               </div>
             ) : (
-              <pre className="p-4 bg-slate-900 rounded-lg text-sm text-slate-300 font-mono overflow-auto">
+              <pre 
+                className="p-4 text-sm font-mono overflow-auto border"
+                style={{ 
+                  background: '#000', 
+                  borderColor: 'var(--grid-color)',
+                  color: 'var(--text-main)'
+                }}
+              >
                 {formatValue(ctx.value)}
               </pre>
             )}
           </div>
 
           {/* Verification card */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+          <div className="cyber-card p-5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-white">Verification Status</h3>
-                <p className="text-sm text-slate-400 mt-1">
+                <h3 className="font-bold text-xs tracking-wider flex items-center gap-2" style={{ color: ctx.verified ? 'var(--volt)' : 'var(--data)' }}>
+                  <CheckCircle className="w-4 h-4" />
+                  VERIFICATION STATUS
+                </h3>
+                <p className="text-xs mt-1 normal-case" style={{ color: 'var(--text-dim)' }}>
                   {ctx.verified
                     ? 'This context has been verified by the user'
                     : 'This context has not been verified'}
@@ -309,16 +330,17 @@ export default function ContextDetailPage() {
                 <button
                   onClick={() => verifyMutation.mutate()}
                   disabled={verifyMutation.isPending}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-green-600/50 text-white rounded-lg transition-colors"
+                  className="cyber-btn flex items-center gap-2"
+                  style={{ opacity: verifyMutation.isPending ? 0.5 : 1 }}
                 >
                   <CheckCircle className="w-4 h-4" />
-                  <span>Verify</span>
+                  <span>VERIFY</span>
                 </button>
               )}
               {ctx.verified && (
-                <div className="flex items-center gap-2 text-green-400">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Verified</span>
+                <div className="flex items-center gap-2 badge badge-volt">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>VERIFIED</span>
                 </div>
               )}
             </div>
@@ -328,68 +350,83 @@ export default function ContextDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Status card */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 space-y-4">
-            <h3 className="font-semibold text-white">Status</h3>
+          <div className="cyber-card p-5 space-y-4">
+            <h3 className="font-bold text-xs tracking-wider flex items-center gap-2" style={{ color: 'var(--data)' }}>
+              <Activity className="w-4 h-4" />
+              STATUS
+            </h3>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">Drift Status</span>
-                <span className={cn('inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium', getDriftStatusColor(ctx.drift_status))}>
+                <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>DRIFT STATUS</span>
+                <span 
+                  className="badge inline-flex items-center gap-1.5"
+                  style={{ 
+                    background: `${config.color}20`,
+                    borderColor: config.color,
+                    color: config.color
+                  }}
+                >
                   <StatusIcon className="w-3 h-3" />
                   {ctx.drift_status}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">Confidence</span>
-                <span className={cn('text-sm font-medium', getConfidenceColor(ctx.confidence))}>
+                <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>CONFIDENCE</span>
+                <span 
+                  className="text-sm font-bold"
+                  style={{ color: ctx.confidence >= 0.8 ? 'var(--volt)' : ctx.confidence >= 0.6 ? 'var(--data)' : 'var(--rage)' }}
+                >
                   {(ctx.confidence * 100).toFixed(1)}%
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">Source</span>
-                <span className="text-sm text-slate-300 capitalize">{ctx.source}</span>
+                <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>SOURCE</span>
+                <span className="text-xs" style={{ color: 'var(--text-main)' }}>{ctx.source}</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">Explicit</span>
-                <span className="text-sm text-slate-300">{ctx.explicit ? 'Yes' : 'No'}</span>
+                <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>EXPLICIT</span>
+                <span className="text-xs" style={{ color: ctx.explicit ? 'var(--volt)' : 'var(--text-dim)' }}>
+                  {ctx.explicit ? '⚡ YES' : 'NO'}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Metadata card */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 space-y-4">
-            <h3 className="font-semibold text-white">Metadata</h3>
+          <div className="cyber-card p-5 space-y-4">
+            <h3 className="font-bold text-xs tracking-wider" style={{ color: 'var(--volt)' }}>METADATA</h3>
 
             <div className="space-y-3">
               <div>
-                <span className="text-xs text-slate-500">Created</span>
-                <p className="text-sm text-slate-300">{formatDateTime(ctx.created_at)}</p>
+                <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>CREATED</span>
+                <p className="text-xs normal-case" style={{ color: 'var(--text-main)' }}>{formatDateTime(ctx.created_at)}</p>
               </div>
 
               <div>
-                <span className="text-xs text-slate-500">Last Updated</span>
-                <p className="text-sm text-slate-300">{formatDateTime(ctx.updated_at)}</p>
+                <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>LAST UPDATED</span>
+                <p className="text-xs normal-case" style={{ color: 'var(--text-main)' }}>{formatDateTime(ctx.updated_at)}</p>
               </div>
 
               {ctx.last_accessed_at && (
                 <div>
-                  <span className="text-xs text-slate-500">Last Accessed</span>
-                  <p className="text-sm text-slate-300">{formatDateTime(ctx.last_accessed_at)}</p>
+                  <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>LAST ACCESSED</span>
+                  <p className="text-xs normal-case" style={{ color: 'var(--text-main)' }}>{formatDateTime(ctx.last_accessed_at)}</p>
                 </div>
               )}
 
               <div>
-                <span className="text-xs text-slate-500">Access Count</span>
-                <p className="text-sm text-slate-300">{ctx.access_count}</p>
+                <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>ACCESS COUNT</span>
+                <p className="text-sm font-bold" style={{ color: 'var(--data)' }}>{ctx.access_count}</p>
               </div>
 
               {ctx.ttl_seconds && (
                 <div>
-                  <span className="text-xs text-slate-500">TTL</span>
-                  <p className="text-sm text-slate-300">{ctx.ttl_seconds}s</p>
+                  <span className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>TTL</span>
+                  <p className="text-xs" style={{ color: 'var(--text-main)' }}>{ctx.ttl_seconds}s</p>
                 </div>
               )}
             </div>
@@ -399,39 +436,47 @@ export default function ContextDetailPage() {
 
       {/* History panel */}
       {showHistory && (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 animate-slide-up">
-          <h3 className="font-semibold text-white mb-4">Version History</h3>
+        <div className="cyber-card p-5 animate-fade-in">
+          <h3 className="font-bold text-xs tracking-wider mb-4 flex items-center gap-2" style={{ color: 'var(--data)' }}>
+            <History className="w-4 h-4" />
+            VERSION HISTORY
+          </h3>
           <div className="space-y-4">
             {history.map((version, index) => (
               <div
                 key={version.id}
-                className={cn(
-                  'p-4 rounded-lg border',
-                  index === 0
-                    ? 'bg-sky-500/5 border-sky-500/20'
-                    : 'bg-slate-900/50 border-slate-700'
-                )}
+                className="p-4 border"
+                style={{ 
+                  borderColor: index === 0 ? 'var(--data)' : 'var(--grid-color)',
+                  background: index === 0 ? 'var(--data-dim)' : 'rgba(0,0,0,0.3)'
+                }}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-white">Version {version.version}</span>
+                    <span className="font-bold text-xs tracking-wider" style={{ color: 'var(--text-main)' }}>
+                      VERSION {version.version}
+                    </span>
                     {index === 0 && (
-                      <span className="px-2 py-0.5 bg-sky-500/20 text-sky-400 text-xs rounded-full">
-                        Current
-                      </span>
+                      <span className="badge badge-data">CURRENT</span>
                     )}
                   </div>
-                  <span className="text-sm text-slate-500">{formatDateTime(version.created_at)}</span>
+                  <span className="text-xs" style={{ color: 'var(--text-dim)' }}>{formatDateTime(version.created_at)}</span>
                 </div>
-                <pre className="p-2 bg-slate-900 rounded text-sm text-slate-300 font-mono mb-2">
+                <pre 
+                  className="p-2 text-sm font-mono mb-2 border"
+                  style={{ background: '#000', borderColor: 'var(--grid-color)', color: 'var(--text-main)' }}
+                >
                   {formatValue(version.value)}
                 </pre>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="normal-case" style={{ color: 'var(--text-dim)' }}>
                     {version.change_reason || 'No reason provided'}
                   </span>
-                  <span className={cn('font-medium', getConfidenceColor(version.confidence))}>
-                    {(version.confidence * 100).toFixed(0)}% confidence
+                  <span 
+                    className="font-bold"
+                    style={{ color: version.confidence >= 0.8 ? 'var(--volt)' : version.confidence >= 0.6 ? 'var(--data)' : 'var(--rage)' }}
+                  >
+                    {(version.confidence * 100).toFixed(0)}% CONFIDENCE
                   </span>
                 </div>
               </div>
